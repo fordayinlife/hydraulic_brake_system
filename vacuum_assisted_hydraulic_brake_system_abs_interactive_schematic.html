@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vacuum-Assisted Hydraulic Brake System & ABS — Interactive Cutaway</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #0b1120;
+      color: #e2e8f0;
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Custom Range Sliders */
+    input[type='range'] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      cursor: pointer;
+    }
+    input[type='range']::-webkit-slider-runnable-track {
+      height: 8px;
+      border-radius: 999px;
+      background: #1e293b;
+      border: 1px solid #334155;
+    }
+    input[type='range']::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #38bdf8;
+      border: 2px solid #f8fafc;
+      margin-top: -7px;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.7);
+      transition: transform 0.12s ease, background-color 0.15s ease;
+    }
+    input[type='range']::-webkit-slider-thumb:hover {
+      transform: scale(1.12);
+    }
+    #pedalSlider::-webkit-slider-thumb {
+      background: #f43f5e;
+      box-shadow: 0 0 14px rgba(244, 63, 94, 0.8);
+    }
+
+    /* Interactive SVG Component Hotspots */
+    .component-hotspot {
+      cursor: pointer;
+      transition: filter 0.2s ease;
+    }
+    .component-hotspot:hover .hotspot-outline {
+      stroke-opacity: 0.9;
+      stroke-width: 2.5;
+    }
+    .component-hotspot.active .hotspot-outline {
+      stroke: #38bdf8;
+      stroke-opacity: 1;
+      stroke-width: 3;
+      filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.75));
+    }
+
+    /* Prevent accidental text selection during press/hold */
+    .no-select {
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    .panel-card {
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(11, 17, 32, 0.98) 100%);
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      box-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.75);
+    }
+
+    @keyframes absFlash {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.45; }
+    }
+    .abs-flashing {
+      animation: absFlash 0.24s infinite;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Top Engineering Header Bar -->
+  <header class="border-b border-slate-800/90 bg-slate-950/90 backdrop-blur-md sticky top-0 z-30">
+    <div class="max-w-[1720px] mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- Brand & Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/25 to-rose-500/25 border border-cyan-400/40 flex items-center justify-center shadow-inner shrink-0">
+          <svg class="w-6 h-6 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <circle cx="12" cy="12" r="9" />
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 3v3M12 18v3M3 12h3M18 12h3M18.36 5.64l-2.12 2.12M7.76 16.24l-2.12 2.12" />
+          </svg>
+        </div>
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <h1 class="text-base sm:text-lg font-bold tracking-tight text-slate-100">
+              Vacuum-Assisted Hydraulic Brake System &amp; ABS
+            </h1>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-mono font-semibold bg-cyan-500/15 text-cyan-300 border border-cyan-500/35">
+              INTERACTIVE CAD CUTAWAY
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 hidden sm:block">
+            Real-time pneumatic booster, tandem master cylinder, ABS solenoid modulator &amp; floating disc caliper simulation
+          </p>
+        </div>
+      </div>
+
+      <!-- Top Quick Action Controls -->
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- Primary Press / Latch Brake Button -->
+        <button id="headerBrakeBtn" class="no-select px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide text-white bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 shadow-lg shadow-rose-950/60 border border-rose-400/40 transition flex items-center gap-2">
+          <span id="headerBrakeDot" class="w-2.5 h-2.5 rounded-full bg-white/80"></span>
+          <span id="headerBrakeLabel">PRESS / LATCH BRAKE</span>
+        </button>
+
+        <!-- Auto-Demo Loop Toggle -->
+        <button id="autoDemoBtn" class="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800/95 hover:bg-slate-700 text-cyan-300 border border-cyan-500/40 transition flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polygon points="5 3 19 12 5 21 5 3" />
+          </svg>
+          <span id="autoDemoLabel">Auto-Demo Loop: OFF</span>
+        </button>
+
+        <!-- Road Surface / ABS Mode Toggle -->
+        <button id="roadModeBtn" class="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800/95 hover:bg-slate-700 text-emerald-300 border border-emerald-500/40 transition flex items-center gap-1.5">
+          <span id="roadModeDot" class="w-2 h-2 rounded-full bg-slate-400"></span>
+          <span id="roadModeLabel">Road: Dry Asphalt</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Live Telemetry Strip -->
+  <section class="border-b border-slate-800/80 bg-slate-900/70">
+    <div class="max-w-[1720px] mx-auto px-4 sm:px-6 py-2.5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+      <div class="bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-1.5 flex flex-col">
+        <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400">Pedal Force</span>
+        <span id="telPedalForce" class="font-mono text-sm sm:text-base font-bold text-slate-100">0 N</span>
+      </div>
+      <div class="bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-1.5 flex flex-col">
+        <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400">Booster Assist (3.5x)</span>
+        <span id="telBoosterAssist" class="font-mono text-sm sm:text-base font-bold text-amber-300">+0 N</span>
+      </div>
+      <div class="bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-1.5 flex flex-col">
+        <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400">Rear Chamber Press.</span>
+        <span id="telRearPressure" class="font-mono text-sm sm:text-base font-bold text-cyan-300">4.8 PSI (VAC)</span>
+      </div>
+      <div class="bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-1.5 flex flex-col">
+        <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400">Line Hydraulic Press.</span>
+        <span id="telLinePsi" class="font-mono text-sm sm:text-base font-bold text-rose-400">0 PSI</span>
+      </div>
+      <div class="bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-1.5 flex flex-col">
+        <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400">Wheel Speed</span>
+        <span id="telWheelSpeed" class="font-mono text-sm sm:text-base font-bold text-emerald-300">65.0 MPH</span>
+      </div>
+      <div class="bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-1.5 flex flex-col">
+        <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400">ABS Valve State</span>
+        <span id="telAbsState" class="font-mono text-xs sm:text-sm font-bold text-slate-300 truncate">STANDBY (OPEN)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 max-w-[1720px] w-full mx-auto px-3 sm:px-6 py-4 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+
+    <!-- Left / Primary Viewport: Interactive Cutaway Schematic (8 cols on lg+) -->
+    <div class="lg:col-span-8 flex flex-col gap-3">
+      <div class="panel-card rounded-2xl overflow-hidden flex flex-col">
+        <!-- Legend & Active System Banner -->
+        <div class="px-4 py-2.5 bg-slate-900/95 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-sm bg-cyan-400 shadow-[0_0_8px_#22d3ee]"></span>
+              <span class="text-slate-300 font-medium">Vacuum (<span class="font-mono text-cyan-300">4.8 PSI / 20 inHg</span>)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-sm bg-amber-400 shadow-[0_0_8px_#fbbf24]"></span>
+              <span class="text-slate-300 font-medium">Atmospheric Air (<span class="font-mono text-amber-300">14.7 PSI</span>)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-sm bg-rose-500 shadow-[0_0_8px_#f43f5e]"></span>
+              <span class="text-slate-300 font-medium">Brake Fluid (<span class="font-mono text-rose-300">Hydraulic PSI</span>)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-sm bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+              <span class="text-slate-300 font-medium">ABS WSS Signal</span>
+            </div>
+          </div>
+
+          <span id="systemBannerBadge" class="px-2.5 py-0.5 rounded-full font-mono text-[11px] font-semibold bg-cyan-500/15 text-cyan-300 border border-cyan-500/35">
+            STATE: VACUUM CHARGED &amp; BALANCED
+          </span>
+        </div>
+
+        <!-- SVG Engineering Schematic Canvas -->
+        <div class="relative w-full bg-[#080d1a]">
+          <svg id="brakeSchematic" viewBox="0 0 1480 780" class="w-full h-auto block select-none" role="img" aria-label="Interactive Vacuum-Assisted Hydraulic Brake System with ABS Cutaway Schematic">
+            <defs>
+              <!-- CAD Blueprint Grid -->
+              <pattern id="cadMinorGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#111a2e" stroke-width="1" />
+              </pattern>
+              <pattern id="cadMajorGrid" width="100" height="100" patternUnits="userSpaceOnUse">
+                <rect width="100" height="100" fill="url(#cadMinorGrid)" />
+                <path d="M 100 0 L 0 0 0 100" fill="none" stroke="#1e293b" stroke-width="1" stroke-opacity="0.6" />
+              </pattern>
+
+              <!-- Metallic & Fluid Gradients -->
+              <linearGradient id="casingSteel" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#334155" />
+                <stop offset="50%" stop-color="#1e293b" />
+                <stop offset="100%" stop-color="#0f172a" />
+              </linearGradient>
+
+              <linearGradient id="machinedPiston" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#e2e8f0" />
+                <stop offset="48%" stop-color="#94a3b8" />
+                <stop offset="100%" stop-color="#475569" />
+              </linearGradient>
+
+              <linearGradient id="caliperCasting" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#475569" />
+                <stop offset="55%" stop-color="#1e293b" />
+                <stop offset="100%" stop-color="#0f172a" />
+              </linearGradient>
+
+              <linearGradient id="vacuumChamberGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.34" />
+                <stop offset="100%" stop-color="#0284c7" stop-opacity="0.2" />
+              </linearGradient>
+
+              <linearGradient id="airChamberGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.52" />
+                <stop offset="100%" stop-color="#ea580c" stop-opacity="0.28" />
+              </linearGradient>
+
+              <linearGradient id="dot4FluidGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#fb7185" stop-opacity="0.92" />
+                <stop offset="100%" stop-color="#be123c" stop-opacity="0.96" />
+              </linearGradient>
+
+              <radialGradient id="rotorMetalGrad" cx="50%" cy="50%" r="50%">
+                <stop offset="28%" stop-color="#1e293b" />
+                <stop offset="44%" stop-color="#475569" />
+                <stop offset="74%" stop-color="#64748b" />
+                <stop offset="93%" stop-color="#334155" />
+                <stop offset="100%" stop-color="#1e293b" />
+              </radialGradient>
+
+              <radialGradient id="rotorThermalGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="42%" stop-color="#f97316" stop-opacity="0" />
+                <stop offset="70%" stop-color="#ef4444" stop-opacity="0.88" />
+                <stop offset="92%" stop-color="#fbbf24" stop-opacity="0.95" />
+                <stop offset="100%" stop-color="#ef4444" stop-opacity="0" />
+              </radialGradient>
+
+              <filter id="neonCyan" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="2.8" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+              <filter id="neonRed" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="3.2" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+
+            <!-- CAD Grid Background -->
+            <rect width="1480" height="780" fill="url(#cadMajorGrid)" />
+
+            <!-- Subsystem Section Dividers -->
+            <g stroke="#1e293b" stroke-width="1.2" stroke-dasharray="5 6" opacity="0.7">
+              <line x1="574" y1="18" x2="574" y2="762" />
+              <line x1="946" y1="18" x2="946" y2="762" />
+              <line x1="946" y1="390" x2="1465" y2="390" />
+            </g>
+
+            <!-- Section Headers -->
+            <g font-family="JetBrains Mono, monospace" font-size="11" fill="#64748b" letter-spacing="1.4">
+              <text x="24" y="26">01 // PNEUMATIC VACUUM ASSIST</text>
+              <text x="590" y="26">02 // HYDRAULIC MASTER CYLINDER &amp; ABS HCU</text>
+              <text x="962" y="26">03 // FRONT &amp; REAR FLOATING DISC CALIPERS</text>
+            </g>
+
+            <!-- ===================================================================== -->
+            <!-- TUBES, HYDRAULIC LINES & ABS SENSOR HARNESSES                         -->
+            <!-- ===================================================================== -->
+
+            <!-- 1. ENGINE VACUUM HOSE (Booster Front Chamber -> Check Valve -> Engine Intake) -->
+            <g id="vacuumHoseGroup">
+              <path d="M 226 96 L 500 96 Q 512 96 512 108 L 512 212" fill="none" stroke="#164e63" stroke-width="15" stroke-linecap="round" />
+              <path d="M 226 96 L 500 96 Q 512 96 512 108 L 512 212" fill="none" stroke="#083344" stroke-width="9" stroke-linecap="round" />
+              <path id="vacuumFlowDashes" d="M 512 212 L 512 108 Q 512 96 500 96 L 226 96" fill="none" stroke="#22d3ee" stroke-width="4.5" stroke-dasharray="10 14" stroke-linecap="round" filter="url(#neonCyan)" />
+            </g>
+
+            <!-- 2. PRIMARY HYDRAULIC CIRCUIT (Master Cylinder Primary -> ABS -> Front Caliper) -->
+            <g id="primaryLineGroup">
+              <!-- MC Primary Port -> ABS Inlet 1 -->
+              <path d="M 688 432 L 688 510" fill="none" stroke="#4c0519" stroke-width="12" />
+              <path id="priInBase" d="M 688 432 L 688 510" fill="none" stroke="#e11d48" stroke-width="6.5" />
+              <path id="priInFlow" d="M 688 432 L 688 510" fill="none" stroke="#fda4af" stroke-width="3.5" stroke-dasharray="7 11" />
+
+              <!-- ABS Outlet 1 -> Front Brake Caliper Port -->
+              <path d="M 918 548 L 958 548 Q 968 548 968 538 L 968 72 Q 968 62 978 62 L 1340 62 Q 1350 62 1350 72 L 1350 130" fill="none" stroke="#4c0519" stroke-width="12" stroke-linejoin="round" />
+              <path id="priOutBase" d="M 918 548 L 958 548 Q 968 548 968 538 L 968 72 Q 968 62 978 62 L 1340 62 Q 1350 62 1350 72 L 1350 130" fill="none" stroke="#e11d48" stroke-width="6.5" stroke-linejoin="round" />
+              <path id="priOutFlow" d="M 918 548 L 958 548 Q 968 548 968 538 L 968 72 Q 968 62 978 62 L 1340 62 Q 1350 62 1350 72 L 1350 130" fill="none" stroke="#fecdd3" stroke-width="3.5" stroke-dasharray="9 15" stroke-linejoin="round" />
+            </g>
+
+            <!-- 3. SECONDARY HYDRAULIC CIRCUIT (Master Cylinder Secondary -> ABS -> Rear Caliper) -->
+            <g id="secondaryLineGroup">
+              <!-- MC Secondary Port -> ABS Inlet 2 -->
+              <path d="M 814 432 L 814 510" fill="none" stroke="#4c0519" stroke-width="12" />
+              <path id="secInBase" d="M 814 432 L 814 510" fill="none" stroke="#e11d48" stroke-width="6.5" />
+              <path id="secInFlow" d="M 814 432 L 814 510" fill="none" stroke="#fda4af" stroke-width="3.5" stroke-dasharray="7 11" />
+
+              <!-- ABS Outlet 2 -> Rear Brake Caliper Port -->
+              <path d="M 918 654 L 958 654 Q 968 654 968 664 L 968 742 Q 968 752 978 752 L 1340 752 Q 1350 752 1350 742 L 1350 644" fill="none" stroke="#4c0519" stroke-width="12" stroke-linejoin="round" />
+              <path id="secOutBase" d="M 918 654 L 958 654 Q 968 654 968 664 L 968 742 Q 968 752 978 752 L 1340 752 Q 1350 752 1350 742 L 1350 644" fill="none" stroke="#e11d48" stroke-width="6.5" stroke-linejoin="round" />
+              <path id="secOutFlow" d="M 918 654 L 958 654 Q 968 654 968 664 L 968 742 Q 968 752 978 752 L 1340 752 Q 1350 752 1350 742 L 1350 644" fill="none" stroke="#fecdd3" stroke-width="3.5" stroke-dasharray="9 15" stroke-linejoin="round" />
+            </g>
+
+            <!-- 4. ABS RETURN PUMP FEEDBACK LINE (ABS Pump -> Master Cylinder Supply) -->
+            <g id="absReturnPipeGroup" opacity="0.55">
+              <path d="M 622 510 L 622 474 Q 622 464 632 464 L 688 464" fill="none" stroke="#881337" stroke-width="8" stroke-linejoin="round" />
+              <path id="absReturnDashes" d="M 622 510 L 622 474 Q 622 464 632 464 L 688 464" fill="none" stroke="#fb7185" stroke-width="3" stroke-dasharray="6 10" />
+            </g>
+
+            <!-- 5. ABS WHEEL SPEED SENSOR ELECTRICAL HARNESSES (Emerald Pulses) -->
+            <g id="wssWireGroup">
+              <path d="M 1028 122 L 988 122 Q 980 122 980 130 L 980 594 Q 980 602 972 602 L 918 602" fill="none" stroke="#065f46" stroke-width="4.5" stroke-linejoin="round" />
+              <path id="frontWssDashes" d="M 1028 122 L 988 122 Q 980 122 980 130 L 980 594 Q 980 602 972 602 L 918 602" fill="none" stroke="#34d399" stroke-width="2.5" stroke-dasharray="5 13" stroke-linejoin="round" />
+
+              <path d="M 1030 484 L 996 484 Q 988 484 988 492 L 988 612 Q 988 620 980 620 L 918 620" fill="none" stroke="#065f46" stroke-width="4.5" stroke-linejoin="round" />
+              <path id="rearWssDashes" d="M 1030 484 L 996 484 Q 988 484 988 492 L 988 612 Q 988 620 980 620 L 918 620" fill="none" stroke="#34d399" stroke-width="2.5" stroke-dasharray="5 13" stroke-linejoin="round" />
+            </g>
+
+            <!-- ===================================================================== -->
+            <!-- COMPONENT 1: ENGINE INTAKE MANIFOLD & SPRING-LOADED CHECK VALVE       -->
+            <!-- ===================================================================== -->
+            <g id="comp-vacuum" class="component-hotspot" data-comp="vacuum">
+              <rect class="hotspot-outline" x="28" y="42" width="346" height="114" rx="14" fill="rgba(15,23,42,0.6)" stroke="#22d3ee" stroke-opacity="0.35" stroke-width="1.5" />
+
+              <!-- Engine Intake Manifold Casting -->
+              <rect x="42" y="58" width="184" height="72" rx="10" fill="url(#casingSteel)" stroke="#475569" stroke-width="2" />
+              <rect x="50" y="66" width="168" height="56" rx="6" fill="#083344" stroke="#06b6d4" stroke-width="1.4" />
+              <circle cx="80" cy="94" r="11" fill="#042f2e" stroke="#22d3ee" stroke-width="1.5" />
+              <circle cx="120" cy="94" r="11" fill="#042f2e" stroke="#22d3ee" stroke-width="1.5" />
+              <circle cx="160" cy="94" r="11" fill="#042f2e" stroke="#22d3ee" stroke-width="1.5" />
+              <text x="134" y="146" text-anchor="middle" font-size="11" font-weight="700" fill="#67e8f9">ENGINE INTAKE MANIFOLD (~20 inHg)</text>
+
+              <!-- Spring-Loaded One-Way Vacuum Check Valve -->
+              <rect x="272" y="70" width="86" height="48" rx="9" fill="#1e293b" stroke="#22d3ee" stroke-width="2" />
+              <!-- Valve Seat Ring -->
+              <line x1="306" y1="76" x2="306" y2="85" stroke="#94a3b8" stroke-width="3" />
+              <line x1="306" y1="103" x2="306" y2="112" stroke="#94a3b8" stroke-width="3" />
+              <!-- Animated Check Valve Flapper Disc (Translates left when evacuating) -->
+              <g id="checkValveFlapperGroup" transform="translate(0, 0)">
+                <rect x="301" y="83" width="6" height="22" rx="2" fill="#22d3ee" />
+                <polygon points="301,85 289,94 301,103" fill="#22d3ee" />
+              </g>
+              <!-- Check Valve Return Spring -->
+              <path id="checkValveSpring" d="M 308 94 L 315 86 L 322 102 L 329 86 L 336 102 L 343 94 L 350 94" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" />
+              <text x="315" y="133" text-anchor="middle" font-size="10" font-family="JetBrains Mono, monospace" font-weight="700" fill="#a5f3fc">ONE-WAY CHECK VALVE</text>
+            </g>
+
+            <!-- ===================================================================== -->
+            <!-- COMPONENT 2: BRAKE PEDAL & INPUT PUSHROD (Clickable to toggle brake!) -->
+            <!-- ===================================================================== -->
+            <g id="comp-pedal" class="component-hotspot" data-comp="pedal">
+              <rect class="hotspot-outline" x="24" y="236" width="204" height="432" rx="14" fill="rgba(15,23,42,0.45)" stroke="#94a3b8" stroke-opacity="0.3" stroke-width="1.5" />
+
+              <!-- Firewall Upper Pivot Bracket -->
+              <rect x="90" y="256" width="50" height="44" rx="8" fill="#1e293b" stroke="#64748b" stroke-width="2" />
+              <circle cx="115" cy="278" r="9" fill="#0f172a" stroke="#e2e8f0" stroke-width="2.5" />
+              <text x="115" y="250" text-anchor="middle" font-size="10" font-family="JetBrains Mono, monospace" font-weight="600" fill="#94a3b8">FIREWALL PIVOT</text>
+
+              <!-- Input Pushrod (Translates right into Booster Control Valve) -->
+              <g id="inputPushrodGroup" transform="translate(0, 0)">
+                <rect x="118" y="413" width="168" height="14" rx="4" fill="url(#machinedPiston)" stroke="#cbd5e1" stroke-width="1.5" />
+                <rect x="110" y="407" width="20" height="26" rx="4" fill="#475569" stroke="#e2e8f0" stroke-width="1.5" />
+              </g>
+
+              <!-- Rotating Brake Pedal Arm (Pivots around 115, 278) -->
+              <g id="pedalArmGroup" transform="rotate(0, 115, 278)">
+                <path d="M 108 278 L 122 278 L 106 594 L 86 594 Z" fill="url(#machinedPiston)" stroke="#f8fafc" stroke-width="1.8" stroke-linejoin="round" />
+                <!-- Clevis Pin -->
+                <circle cx="116" cy="420" r="7" fill="#f43f5e" stroke="#f8fafc" stroke-width="2" />
+                <!-- Rubber Brake Pedal Pad -->
+                <rect x="62" y="574" width="34" height="62" rx="8" fill="#0f172a" stroke="#f43f5e" stroke-width="2.8" />
+                <line x1="69" y1="588" x2="89" y2="588" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" />
+                <line x1="69" y1="600" x2="89" y2="600" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" />
+                <line x1="69" y1="612" x2="89" y2="612" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" />
+                <line x1="69" y1="624" x2="89" y2="624" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" />
+              </g>
+
+              <!-- Driver Foot Force Vector Arrow -->
+              <g id="pedalForceArrowGroup" opacity="0">
+                <line x1="26" y1="605" x2="54" y2="605" stroke="#f43f5e" stroke-width="4.5" stroke-linecap="round" />
+                <polygon points="62,605 49,597 49,613" fill="#f43f5e" />
+              </g>
+
+              <text x="126" y="655" text-anchor="middle" font-size="11" font-weight="700" fill="#e2e8f0">BRAKE PEDAL (CLICK TO APPLY)</text>
+            </g>
+
+            <!-- ===================================================================== -->
+            <!-- COMPONENT 3: VACUUM BRAKE BOOSTER (DETAILED CUTAWAY)                  -->
+            <!-- ===================================================================== -->
+            <g id="comp-booster" class="component-hotspot" data-comp="booster">
+              <rect class="hotspot-outline" x="234" y="192" width="332" height="476" rx="16" fill="rgba(15,23,42,0.48)" stroke="#38bdf8" stroke-opacity="0.35" stroke-width="1.5" />
+
+              <!-- Stamped-Steel Booster Drum Housing -->
+              <rect x="268" y="212" width="288" height="422" rx="46" fill="#0b1322" stroke="#64748b" stroke-width="4" />
+
+              <!-- Rear Air Filter Boot Neck -->
+              <rect x="224" y="386" width="44" height="68" rx="4" fill="#1e293b" stroke="#64748b" stroke-width="2.5" />
+              <!-- Porous Air Filter Element -->
+              <rect x="232" y="392" width="16" height="56" rx="3" fill="#78350f" stroke="#f59e0b" stroke-width="1.4" />
+              <line x1="232" y1="404" x2="248" y2="404" stroke="#fbbf24" stroke-width="1.2" />
+              <line x1="232" y1="420" x2="248" y2="420" stroke="#fbbf24" stroke-width="1.2" />
+              <line x1="232" y1="436" x2="248" y2="436" stroke="#fbbf24" stroke-width="1.2" />
+
+              <!-- REAR CHAMBER (Control Chamber: Cyan Vacuum -> Amber Atmospheric Air) -->
+              <rect id="rearChamberRect" x="272" y="216" width="126" height="414" rx="40" fill="url(#vacuumChamberGrad)" />
+              <rect id="rearChamberAirOverlay" x="272" y="216" width="126" height="414" rx="40" fill="url(#airChamberGrad)" opacity="0" />
+
+              <!-- FRONT CHAMBER (Constant Vacuum Chamber: Cyan) -->
+              <rect id="frontChamberRect" x="398" y="216" width="154" height="414" rx="40" fill="url(#vacuumChamberGrad)" />
+
+              <!-- Animated Atmospheric Air Inflow Streaks (Amber) -->
+              <g id="airInflowStreaks" opacity="0">
+                <path d="M 206 402 L 264 402 Q 292 402 308 320" fill="none" stroke="#fbbf24" stroke-width="3.5" stroke-dasharray="7 9" stroke-linecap="round" />
+                <path d="M 206 438 L 264 438 Q 292 438 308 520" fill="none" stroke="#fbbf24" stroke-width="3.5" stroke-dasharray="7 9" stroke-linecap="round" />
+              </g>
+
+              <!-- Large Booster Return Springs (Dynamically compressed as diaphragm moves forward) -->
+              <path id="boosterTopSpring" d="M 416 306 L 432 286 L 448 326 L 464 286 L 480 326 L 496 286 L 512 326 L 528 286 L 548 306" fill="none" stroke="#94a3b8" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round" />
+              <path id="boosterBotSpring" d="M 416 540 L 432 520 L 448 560 L 464 520 L 480 560 L 496 520 L 512 560 L 528 520 L 548 540" fill="none" stroke="#94a3b8" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round" />
+
+              <!-- MOVABLE ROLLING DIAPHRAGM, POWER PISTON, CONTROL VALVE & OUTPUT PUSHROD -->
+              <g id="boosterDiaphragmGroup" transform="translate(0, 0)">
+                <!-- Rolling Rubber Diaphragm Upper & Lower -->
+                <path d="M 398 216 C 383 216, 383 250, 398 254 L 398 378" fill="none" stroke="#38bdf8" stroke-width="6.5" stroke-linecap="round" />
+                <path d="M 398 630 C 383 630, 383 596, 398 592 L 398 462" fill="none" stroke="#38bdf8" stroke-width="6.5" stroke-linecap="round" />
+
+                <!-- Steel Diaphragm Backing Plate -->
+                <rect x="395" y="252" width="10" height="128" rx="3" fill="#cbd5e1" />
+                <rect x="395" y="460" width="10" height="128" rx="3" fill="#cbd5e1" />
+
+                <!-- Central Control Valve Housing -->
+                <rect x="278" y="378" width="138" height="84" rx="12" fill="#1e293b" stroke="#94a3b8" stroke-width="2" />
+
+                <!-- Internal Vacuum Transfer Channel (Connects Front & Rear Chambers at Rest) -->
+                <path d="M 340 387 L 408 387" stroke="#22d3ee" stroke-width="5.5" stroke-linecap="round" />
+                <!-- Vacuum Port Valve Plunger (Visibly seats/closes when pedal pressed!) -->
+                <rect id="vacuumPortValve" x="342" y="381" width="7" height="4" rx="1.5" fill="#f43f5e" />
+
+                <!-- Atmospheric Air Valve Plunger (Visibly opens passage when pedal pressed!) -->
+                <rect id="atmosAirValve" x="312" y="395" width="7" height="50" rx="2" fill="#f59e0b" />
+
+                <!-- Rubber Reaction Disc (Compresses under hydraulic reaction force) -->
+                <rect id="reactionDisc" x="408" y="399" width="13" height="42" rx="4" fill="#fb7185" stroke="#fecdd3" stroke-width="1.3" />
+
+                <!-- Output Pushrod (Drives Tandem Master Cylinder Primary Piston) -->
+                <rect x="421" y="413" width="166" height="14" rx="4" fill="url(#machinedPiston)" stroke="#f8fafc" stroke-width="1.5" />
+                <circle cx="587" cy="420" r="7.5" fill="#e2e8f0" />
+              </g>
+
+              <!-- Booster Chamber Telemetry Labels -->
+              <text x="334" y="246" text-anchor="middle" font-size="10.5" font-family="JetBrains Mono, monospace" font-weight="700" fill="#f8fafc">REAR CHAMBER</text>
+              <text id="rearChamberSvgText" x="334" y="263" text-anchor="middle" font-size="10" font-family="JetBrains Mono, monospace" font-weight="600" fill="#22d3ee">4.8 PSI (VAC)</text>
+
+              <text x="478" y="246" text-anchor="middle" font-size="10.5" font-family="JetBrains Mono, monospace" font-weight="700" fill="#f8fafc">FRONT CHAMBER</text>
+              <text x="478" y="263" text-anchor="middle" font-size="10" font-family="JetBrains Mono, monospace" font-weight="600" fill="#22d3ee">4.8 PSI (VAC)</text>
+
+              <text x="412" y="655" text-anchor="middle" font-size="11.5" font-weight="700" fill="#e2e8f0">VACUUM BRAKE BOOSTER (CUTAWAY)</text>
+            </g>
+
+            <!-- ===================================================================== -->
+            <!-- COMPONENT 4: TANDEM MASTER CYLINDER & FLUID RESERVOIR                 -->
+            <!-- ===================================================================== -->
+            <g id="comp-master" class="component-hotspot" data-comp="master">
+              <rect class="hotspot-outline" x="580" y="144" width="316" height="310" rx="16" fill="rgba(15,23,42,0.48)" stroke="#f43f5e" stroke-opacity="0.35" stroke-width="1.5" />
+
+              <!-- Translucent Brake Fluid Reservoir -->
+              <rect x="618" y="160" width="198" height="118" rx="14" fill="rgba(30, 41, 59, 0.75)" stroke="#94a3b8" stroke-width="2.5" />
+              <!-- Filler Cap -->
+              <rect x="688" y="148" width="58" height="14" rx="4" fill="#334155" stroke="#cbd5e1" stroke-width="1.5" />
+              <!-- Dual-Circuit Safety Baffle -->
+              <line x1="717" y1="224" x2="717" y2="278" stroke="#94a3b8" stroke-width="2.5" />
+
+              <!-- DOT 4 Brake Fluid Fill (Drops slightly as fluid displaces into calipers) -->
+              <rect id="reservoirFluidRect" x="622" y="192" width="190" height="82" rx="10" fill="url(#dot4FluidGrad)" />
+
+              <!-- Fluid Level Sensor Float (Moves vertically with meniscus) -->
+              <g id="fluidSensorFloat" transform="translate(0, 0)">
+                <rect x="780" y="186" width="22" height="12" rx="3" fill="#fbbf24" stroke="#fef3c7" stroke-width="1.2" />
+                <line x1="791" y1="162" x2="791" y2="186" stroke="#94a3b8" stroke-width="2" />
+              </g>
+
+              <!-- MAX / MIN Level Markers -->
+              <line x1="624" y1="192" x2="646" y2="192" stroke="#f8fafc" stroke-width="1.5" />
+              <text x="651" y="196" font-size="9" font-family="JetBrains Mono, monospace" fill="#f8fafc">MAX</text>
+              <line x1="624" y1="246" x2="646" y2="246" stroke="#fda4af" stroke-width="1.5" />
+              <text x="651" y="250" font-size="9" font-family="JetBrains Mono, monospace" fill="#fda4af">MIN</text>
+              <text x="717" y="216" text-anchor="middle" font-size="10" font-family="JetBrains Mono, monospace" font-weight="700" fill="#ffe4e6">DOT 4 FLUID</text>
+
+              <!-- Reservoir Feed & Compensating Ports -->
+              <rect x="652" y="278" width="16" height="48" fill="#e11d48" stroke="#475569" stroke-width="2" />
+              <rect x="772" y="278" width="16" height="48" fill="#e11d48" stroke="#475569" stroke-width="2" />
+
+              <!-- Tandem Master Cylinder Casting Housing -->
+              <rect x="586" y="326" width="292" height="106" rx="14" fill="url(#casingSteel)" stroke="#64748b" stroke-width="3" />
+              <!-- Inner Hydraulic Bore -->
+              <rect x="590" y="338" width="278" height="82" rx="8" fill="#4c0519" stroke="#334155" stroke-width="1.5" />
+
+              <!-- Pressurized Fluid Chambers -->
+              <rect id="mcPriChamber" x="638" y="340" width="90" height="78" fill="#e11d48" opacity="0.8" />
+              <rect id="mcSecChamber" x="768" y="340" width="96" height="78" fill="#e11d48" opacity="0.8" />
+
+              <!-- Primary & Secondary Internal Return Springs -->
+              <path id="mcPriSpring" d="M 646 379 L 656 355 L 668 403 L 680 355 L 692 403 L 704 355 L 716 379" fill="none" stroke="#e2e8f0" stroke-width="2.6" stroke-linecap="round" />
+              <path id="mcSecSpring" d="M 776 379 L 788 355 L 800 403 L 812 355 L 824 403 L 836 355 L 854 379" fill="none" stroke="#e2e8f0" stroke-width="2.6" stroke-linecap="round" />
+
+              <!-- Primary Piston (Translates right with booster pushrod) -->
+              <g id="mcPriPistonGroup" transform="translate(0, 0)">
+                <rect x="592" y="340" width="48" height="78" rx="5" fill="url(#machinedPiston)" stroke="#f8fafc" stroke-width="1.5" />
+                <rect x="596" y="338" width="8" height="82" rx="2" fill="#0f172a" />
+                <rect x="630" y="338" width="8" height="82" rx="2" fill="#0f172a" />
+                <text x="616" y="383" text-anchor="middle" font-size="9.5" font-family="JetBrains Mono, monospace" font-weight="700" fill="#0f172a">PRI</text>
+              </g>
+
+              <!-- Secondary Floating Piston (Translates right under hydraulic pressure) -->
+              <g id="mcSecPistonGroup" transform="translate(0, 0)">
+                <rect x="720" y="340" width="48" height="78" rx="5" fill="url(#machinedPiston)" stroke="#f8fafc" stroke-width="1.5" />
+                <rect x="724" y="338" width="8" height="82" rx="2" fill="#0f172a" />
+                <rect x="758" y="338" width="8" height="82" rx="2" fill="#0f172a" />
+                <text x="744" y="383" text-anchor="middle" font-size="9.5" font-family="JetBrains Mono, monospace" font-weight="700" fill="#0f172a">SEC</text>
+              </g>
+
+              <text x="734" y="447" text-anchor="middle" font-size="11.5" font-weight="700" fill="#fda4af">TANDEM MASTER CYLINDER</text>
+            </g>
+
+            <!-- ===================================================================== -->
+            <!-- COMPONENT 5: ABS HYDRAULIC CONTROL UNIT (HCU) & ECU                   -->
+            <!-- ===================================================================== -->
+            <g id="comp-abs" class="component-hotspot" data-comp="abs">
+              <rect class="hotspot-outline" x="580" y="498" width="352" height="248" rx="16" fill="rgba(15,23,42,0.55)" stroke="#10b981" stroke-opacity="0.38" stroke-width="1.5" />
+
+              <!-- Cutaway Aluminum ABS Modulator Block -->
+              <rect x="592" y="510" width="328" height="222" rx="12" fill="url(#casingSteel)" stroke="#64748b" stroke-width="2.5" />
+
+              <!-- Internal Hydraulic Gallery Channels -->
+              <path d="M 688 510 L 688 548 L 918 548" fill="none" stroke="#e11d48" stroke-width="6.5" />
+              <path d="M 814 510 L 814 654 L 918 654" fill="none" stroke="#e11d48" stroke-width="6.5" />
+              <!-- Dump Gallery to Accumulator & Return Pump -->
+              <path d="M 744 548 L 744 700 L 622 700 L 622 510" fill="none" stroke="#881337" stroke-width="5" stroke-dasharray="5 3" />
+
+              <!-- CHANNEL 1 SOLENOID VALVES (Front Circuit) -->
+              <!-- Inlet Solenoid Valve 1 (Normally Open) -->
+              <g id="absInlet1Group">
+                <rect x="712" y="530" width="34" height="36" rx="6" fill="#0f172a" stroke="#38bdf8" stroke-width="2" />
+                <rect id="absInlet1Plunger" x="723" y="535" width="12" height="10" rx="2" fill="#10b981" />
+                <text x="729" y="525" text-anchor="middle" font-size="8.5" font-family="JetBrains Mono, monospace" font-weight="600" fill="#94a3b8">IN-1</text>
+              </g>
+              <!-- Outlet Solenoid Valve 1 (Normally Closed) -->
+              <g id="absOutlet1Group">
+                <rect x="758" y="564" width="32" height="34" rx="6" fill="#0f172a" stroke="#f59e0b" stroke-width="2" />
+                <rect id="absOutlet1Plunger" x="768" y="582" width="12" height="10" rx="2" fill="#475569" />
+                <text x="774" y="609" text-anchor="middle" font-size="8.5" font-family="JetBrains Mono, monospace" font-weight="600" fill="#94a3b8">OUT-1</text>
+              </g>
+
+              <!-- CHANNEL 2 SOLENOID VALVES (Rear Circuit) -->
+              <!-- Inlet Solenoid Valve 2 (Normally Open) -->
+              <g id="absInlet2Group">
+                <rect x="836" y="636" width="34" height="36" rx="6" fill="#0f172a" stroke="#38bdf8" stroke-width="2" />
+                <rect id="absInlet2Plunger" x="847" y="641" width="12" height="10" rx="2" fill="#10b981" />
+                <text x="853" y="631" text-anchor="middle" font-size="8.5" font-family="JetBrains Mono, monospace" font-weight="600" fill="#94a3b8">IN-2</text>
+              </g>
+              <!-- Outlet Solenoid Valve 2 (Normally Closed) -->
+              <g id="absOutlet2Group">
+                <rect x="836" y="680" width="32" height="32" rx="6" fill="#0f172a" stroke="#f59e0b" stroke-width="2" />
+                <rect id="absOutlet2Plunger" x="846" y="697" width="12" height="9" rx="2" fill="#475569" />
+                <text x="890" y="699" text-anchor="middle" font-size="8.5" font-family="JetBrains Mono, monospace" font-weight="600" fill="#94a3b8">OUT-2</text>
+              </g>
+
+              <!-- ELECTRIC RETURN PUMP (Rotating Eccentric Cam & Impeller) -->
+              <g id="absPumpGroup">
+                <circle cx="634" cy="614" r="25" fill="#0f172a" stroke="#38bdf8" stroke-width="2.5" />
+                <g id="absPumpCamGroup" transform="rotate(0, 634, 614)">
+                  <line x1="615" y1="614" x2="653" y2="614" stroke="#38bdf8" stroke-width="3.2" />
+                  <line x1="634" y1="595" x2="634" y2="633" stroke="#38bdf8" stroke-width="3.2" />
+                  <circle cx="638" cy="614" r="7" fill="#f43f5e" />
+                </g>
+                <text x="634" y="652" text-anchor="middle" font-size="9" font-family="JetBrains Mono, monospace" font-weight="700" fill="#7dd3fc">RETURN PUMP</text>
+              </g>
+
+              <!-- LOW-PRESSURE ACCUMULATOR (Spring-Loaded Piston) -->
+              <g id="absAccumulatorGroup">
+                <rect x="680" y="672" width="50" height="36" rx="6" fill="#4c0519" stroke="#fb7185" stroke-width="1.6" />
+                <rect id="absAccumPiston" x="682" y="692" width="46" height="14" rx="2" fill="#cbd5e1" />
+                <text x="705" y="721" text-anchor="middle" font-size="8.5" font-family="JetBrains Mono, monospace" font-weight="600" fill="#fda4af">ACCUMULATOR</text>
+              </g>
+
+              <!-- ABS ECU LOGIC CONTROLLER -->
+              <rect x="800" y="576" width="110" height="48" rx="8" fill="#022c22" stroke="#10b981" stroke-width="2" />
+              <text x="855" y="594" text-anchor="middle" font-size="9.5" font-family="JetBrains Mono, monospace" font-weight="700" fill="#34d399">ABS ECU LOGIC</text>
+              <text id="absEcuSvgText" x="855" y="613" text-anchor="middle" font-size="9" font-family="JetBrains Mono, monospace" font-weight="700" fill="#a7f3d0">STANDBY</text>
+
+              <text x="756" y="741" text-anchor="middle" font-size="11.5" font-weight="700" fill="#6ee7b7">ABS MODULATOR (HCU) &amp; ECU</text>
+            </g>
+
+            <!-- ===================================================================== -->
+            <!-- COMPONENT 6: FRONT FLOATING DISC BRAKE ASSEMBLY                       -->
+            <!-- ===================================================================== -->
+            <g id="comp-front-brake" class="component-hotspot" data-comp="frontBrake">
+              <rect class="hotspot-outline" x="992" y="36" width="456" height="342" rx="16" fill="rgba(15,23,42,0.44)" stroke="#f43f5e" stroke-opacity="0.35" stroke-width="1.5" />
+
+              <!-- Spinning Front Vented Brake Rotor & Toothed Tone Ring -->
+              <g id="frontRotorGroup" transform="rotate(0, 1126, 212)">
+                <circle cx="1126" cy="212" r="118" fill="url(#rotorMetalGrad)" stroke="#94a3b8" stroke-width="2.5" />
+                <!-- Dynamic Thermal Heat Glow Ring -->
+                <circle id="frontRotorHeat" cx="1126" cy="212" r="115" fill="url(#rotorThermalGlow)" opacity="0" />
+                <!-- Cooling Slots -->
+                <g stroke="#0f172a" stroke-width="3.2" stroke-linecap="round">
+                  <line x1="1126" y1="106" x2="1126" y2="134" />
+                  <line x1="1126" y1="290" x2="1126" y2="318" />
+                  <line x1="1020" y1="212" x2="1048" y2="212" />
+                  <line x1="1204" y1="212" x2="1232" y2="212" />
+                  <line x1="1051" y1="137" x2="1071" y2="157" />
+                  <line x1="1181" y1="267" x2="1201" y2="287" />
+                  <line x1="1201" y1="137" x2="1181" y2="157" />
+                  <line x1="1071" y1="267" x2="1051" y2="287" />
+                </g>
+                <!-- ABS Reluctor Tone Ring -->
+                <circle cx="1126" cy="212" r="56" fill="#1e293b" stroke="#34d399" stroke-width="4.5" stroke-dasharray="5 5" />
+                <!-- Wheel Hub & 5 Lug Bolts -->
+                <circle cx="1126" cy="212" r="42" fill="#0f172a" stroke="#64748b" stroke-width="2" />
+                <circle cx="1126" cy="186" r="5.5" fill="#cbd5e1" />
+                <circle cx="1151" cy="204" r="5.5" fill="#cbd5e1" />
+                <circle cx="1141" cy="233" r="5.5" fill="#cbd5e1" />
+                <circle cx="1111" cy="233" r="5.5" fill="#cbd5e1" />
+                <circle cx="1101" cy="204" r="5.5" fill="#cbd5e1" />
+              </g>
+
+              <!-- Front Wheel Speed Sensor Pickup -->
+              <g id="frontWssSensor">
+                <rect x="1028" y="110" width="38" height="22" rx="5" fill="#064e3b" stroke="#10b981" stroke-width="2" transform="rotate(35, 1047, 121)" />
+                <circle cx="1062" cy="132" r="4.5" fill="#34d399" />
+                <text x="1002" y="94" font-size="9.5" font-family="JetBrains Mono, monospace" font-weight="700" fill="#6ee7b7">FRONT WSS</text>
+              </g>
+
+              <!-- Cutaway Front Floating Brake Caliper Assembly -->
+              <g id="frontCaliperAssembly">
+                <!-- Rotor Cross-Section Edge inside Caliper Slot (Fixed X: 1246..1260) -->
+                <rect x="1246" y="140" width="14" height="144" fill="#64748b" stroke="#cbd5e1" stroke-width="1" />
+
+                <!-- Floating Caliper Bridge & Outer Brake Pad (Slides right +6px to clamp outer face of rotor) -->
+                <g id="frontOuterCaliperGroup" transform="translate(0, 0)">
+                  <path d="M 1196 130 L 1408 130 Q 1422 130 1422 144 L 1422 280 Q 1422 294 1408 294 L 1196 294 L 1196 264 L 1226 264 L 1226 160 L 1196 160 Z" fill="url(#caliperCasting)" stroke="#94a3b8" stroke-width="2.5" stroke-linejoin="round" />
+                  <!-- Outer Pad Backing Plate & Friction Material -->
+                  <rect x="1226" y="162" width="7" height="100" rx="2" fill="#475569" />
+                  <rect x="1233" y="164" width="9" height="96" rx="2" fill="#d97706" stroke="#fbbf24" stroke-width="1" />
+                </g>
+
+                <!-- Pressurized Caliper Fluid Bore -->
+                <rect x="1306" y="162" width="102" height="100" rx="8" fill="#4c0519" stroke="#f43f5e" stroke-width="1.5" />
+                <rect id="frontCaliperFluid" x="1308" y="164" width="98" height="96" rx="6" fill="#e11d48" opacity="0.35" />
+
+                <!-- Extending Hydraulic Caliper Piston + Inner Brake Pad (Slides left -9px onto inner face of rotor) -->
+                <g id="frontInnerPistonGroup" transform="translate(0, 0)">
+                  <rect x="1286" y="166" width="42" height="92" rx="5" fill="url(#machinedPiston)" stroke="#f8fafc" stroke-width="1.6" />
+                  <!-- Inner Pad Backing Plate & Friction Material -->
+                  <rect x="1278" y="162" width="8" height="100" rx="2" fill="#475569" />
+                  <rect x="1269" y="164" width="9" height="96" rx="2" fill="#d97706" stroke="#fbbf24" stroke-width="1" />
+                </g>
+
+                <!-- Dual-Face Friction Contact Glow Lines -->
+                <line id="frontFrictionOuterGlow" x1="1245" y1="164" x2="1245" y2="260" stroke="#fbbf24" stroke-width="3.5" opacity="0" filter="url(#neonRed)" />
+                <line id="frontFrictionInnerGlow" x1="1261" y1="164" x2="1261" y2="260" stroke="#fbbf24" stroke-width="3.5" opacity="0" filter="url(#neonRed)" />
+
+                <text x="1324" y="314" text-anchor="middle" font-size="10" font-family="JetBrains Mono, monospace" font-weight="700" fill="#fda4af">PISTON &amp; BRAKE PADS</text>
+              </g>
+
+              <text x="1218" y="364" text-anchor="middle" font-size="11.5" font-weight="700" fill="#e2e8f0">FRONT DISC BRAKE ASSEMBLY (PRIMARY CIRCUIT)</text>
+            </g>
+
+            <!-- ===================================================================== -->
+            <!-- COMPONENT 7: REAR FLOATING DISC BRAKE ASSEMBLY                        -->
+            <!-- ===================================================================== -->
+            <g id="comp-rear-brake" class="component-hotspot" data-comp="rearBrake">
+              <rect class="hotspot-outline" x="992" y="400" width="456" height="346" rx="16" fill="rgba(15,23,42,0.44)" stroke="#f43f5e" stroke-opacity="0.35" stroke-width="1.5" />
+
+              <!-- Spinning Rear Brake Rotor & Tone Ring -->
+              <g id="rearRotorGroup" transform="rotate(0, 1126, 568)">
+                <circle cx="1126" cy="568" r="102" fill="url(#rotorMetalGrad)" stroke="#94a3b8" stroke-width="2.5" />
+                <circle id="rearRotorHeat" cx="1126" cy="568" r="99" fill="url(#rotorThermalGlow)" opacity="0" />
+                <g stroke="#0f172a" stroke-width="2.8" stroke-linecap="round">
+                  <line x1="1126" y1="476" x2="1126" y2="500" />
+                  <line x1="1126" y1="636" x2="1126" y2="660" />
+                  <line x1="1034" y1="568" x2="1058" y2="568" />
+                  <line x1="1194" y1="568" x2="1218" y2="568" />
+                  <line x1="1061" y1="503" x2="1079" y2="521" />
+                  <line x1="1173" y1="615" x2="1191" y2="633" />
+                  <line x1="1191" y1="503" x2="1173" y2="521" />
+                  <line x1="1079" y1="615" x2="1061" y2="633" />
+                </g>
+                <circle cx="1126" cy="568" r="48" fill="#1e293b" stroke="#34d399" stroke-width="4" stroke-dasharray="4 4" />
+                <circle cx="1126" cy="568" r="36" fill="#0f172a" stroke="#64748b" stroke-width="2" />
+                <circle cx="1126" cy="546" r="4.5" fill="#cbd5e1" />
+                <circle cx="1147" cy="561" r="4.5" fill="#cbd5e1" />
+                <circle cx="1139" cy="586" r="4.5" fill="#cbd5e1" />
+                <circle cx="1113" cy="586" r="4.5" fill="#cbd5e1" />
+                <circle cx="1105" cy="561" r="4.5" fill="#cbd5e1" />
+              </g>
+
+              <!-- Rear Wheel Speed Sensor Pickup -->
+              <g id="rearWssSensor">
+                <rect x="1030" y="472" width="36" height="20" rx="5" fill="#064e3b" stroke="#10b981" stroke-width="2" transform="rotate(35, 1048, 482)" />
+                <circle cx="1062" cy="492" r="4.5" fill="#34d399" />
+                <text x="1002" y="456" font-size="9.5" font-family="JetBrains Mono, monospace" font-weight="700" fill="#6ee7b7">REAR WSS</text>
+              </g>
+
+              <!-- Cutaway Rear Floating Brake Caliper Assembly -->
+              <g id="rearCaliperAssembly">
+                <!-- Rotor Cross-Section Edge inside Caliper Slot (Fixed X: 1234..1246) -->
+                <rect x="1234" y="502" width="12" height="132" fill="#64748b" stroke="#cbd5e1" stroke-width="1" />
+
+                <!-- Floating Caliper Bridge & Outer Pad (Slides right +5px) -->
+                <g id="rearOuterCaliperGroup" transform="translate(0, 0)">
+                  <path d="M 1188 492 L 1398 492 Q 1412 492 1412 506 L 1412 630 Q 1412 644 1398 644 L 1188 644 L 1188 616 L 1216 616 L 1216 520 L 1188 520 Z" fill="url(#caliperCasting)" stroke="#94a3b8" stroke-width="2.5" stroke-linejoin="round" />
+                  <rect x="1216" y="522" width="6" height="92" rx="2" fill="#475569" />
+                  <rect x="1222" y="524" width="8" height="88" rx="2" fill="#d97706" stroke="#fbbf24" stroke-width="1" />
+                </g>
+
+                <!-- Pressurized Fluid Bore -->
+                <rect x="1290" y="522" width="108" height="92" rx="8" fill="#4c0519" stroke="#f43f5e" stroke-width="1.5" />
+                <rect id="rearCaliperFluid" x="1292" y="524" width="104" height="88" rx="6" fill="#e11d48" opacity="0.35" />
+
+                <!-- Extending Hydraulic Caliper Piston + Inner Pad (Slides left -8px) -->
+                <g id="rearInnerPistonGroup" transform="translate(0, 0)">
+                  <rect x="1270" y="526" width="38" height="84" rx="5" fill="url(#machinedPiston)" stroke="#f8fafc" stroke-width="1.6" />
+                  <rect x="1262" y="522" width="8" height="92" rx="2" fill="#475569" />
+                  <rect x="1254" y="524" width="8" height="88" rx="2" fill="#d97706" stroke="#fbbf24" stroke-width="1" />
+                </g>
+
+                <!-- Dual-Face Friction Contact Glow Lines -->
+                <line id="rearFrictionOuterGlow" x1="1233" y1="524" x2="1233" y2="612" stroke="#fbbf24" stroke-width="3" opacity="0" filter="url(#neonRed)" />
+                <line id="rearFrictionInnerGlow" x1="1247" y1="524" x2="1247" y2="612" stroke="#fbbf24" stroke-width="3" opacity="0" filter="url(#neonRed)" />
+
+                <text x="1312" y="664" text-anchor="middle" font-size="10" font-family="JetBrains Mono, monospace" font-weight="700" fill="#fda4af">PISTON &amp; BRAKE PADS</text>
+              </g>
+
+              <text x="1218" y="728" text-anchor="middle" font-size="11.5" font-weight="700" fill="#e2e8f0">REAR DISC BRAKE ASSEMBLY (SECONDARY CIRCUIT)</text>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Bottom Hint Strip -->
+        <div class="px-4 py-2 bg-slate-900/90 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400">
+          <span>Tip: Click <strong class="text-slate-200">PRESS / LATCH BRAKE</strong> once to latch ON hands-free, or hold down for momentary braking.</span>
+          <span class="font-mono text-slate-300">Shortcut: Hold <kbd class="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-200">SPACE</kbd> or click Brake Pedal SVG</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Controls & Component Inspector (4 cols on lg+) -->
+    <div class="lg:col-span-4 flex flex-col gap-4">
+
+      <!-- 1. Brake Pedal & Vehicle Controls Card -->
+      <section class="panel-card rounded-2xl p-4 flex flex-col gap-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+            Pedal &amp; Vehicle Controls
+          </h2>
+          <span id="pedalLatchBadge" class="font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+            0% RELEASED
+          </span>
+        </div>
+
+        <!-- Prominent Primary Press / Latch Brake Button -->
+        <button id="mainBrakeBtn" class="no-select w-full py-3.5 px-4 rounded-xl font-bold text-sm tracking-wide text-white bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 active:scale-[0.99] shadow-lg shadow-rose-950/60 border border-rose-400/45 transition flex items-center justify-center gap-2.5">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 8v4l2.5 2.5" />
+          </svg>
+          <span id="mainBrakeBtnText">PRESS / LATCH BRAKE PEDAL</span>
+        </button>
+
+        <!-- Brake Pedal Travel Slider (0% - 100%) -->
+        <div class="flex flex-col gap-1.5">
+          <div class="flex justify-between text-xs">
+            <label for="pedalSlider" class="font-medium text-slate-300">Brake Pedal Travel (0% – 100%)</label>
+            <span id="pedalSliderVal" class="font-mono text-rose-400 font-bold">0%</span>
+          </div>
+          <input id="pedalSlider" type="range" min="0" max="100" value="0" class="w-full" />
+        </div>
+
+        <!-- Vehicle Speed Slider & Quick Cruise Reset -->
+        <div class="flex flex-col gap-1.5 pt-2 border-t border-slate-800/80">
+          <div class="flex items-center justify-between text-xs">
+            <label for="speedSlider" class="font-medium text-slate-300">Vehicle / Rotor Speed</label>
+            <div class="flex items-center gap-2">
+              <span id="speedSliderVal" class="font-mono text-cyan-400 font-bold">65 MPH</span>
+              <button id="spinWheelsBtn" class="px-2 py-0.5 rounded bg-cyan-950/80 hover:bg-cyan-900 text-[11px] font-mono text-cyan-300 border border-cyan-500/40 transition">
+                Cruise 65 MPH
+              </button>
+            </div>
+          </div>
+          <input id="speedSlider" type="range" min="0" max="100" value="65" class="w-full" />
+        </div>
+
+        <!-- Auto-Accelerate on Release Toggle -->
+        <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-3">
+          <div>
+            <div class="text-xs font-semibold text-slate-200">Auto-Accelerate on Brake Release</div>
+            <div class="text-[11px] text-slate-400">Smoothly spins rotors back up to 65 MPH after releasing brake</div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer shrink-0">
+            <input id="autoCruiseToggle" type="checkbox" checked class="sr-only peer" />
+            <div class="w-11 h-6 bg-slate-800 border border-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:bg-slate-300 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan-600 peer-checked:border-cyan-400"></div>
+          </label>
+        </div>
+
+        <!-- Road Surface / ABS Mode Toggle -->
+        <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-3">
+          <div>
+            <div class="text-xs font-semibold text-slate-200">Ice / Wet Surface (Trigger ABS)</div>
+            <div class="text-[11px] text-slate-400">Heavy braking (&gt;55%) activates 12 Hz ABS solenoid pulsing</div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer shrink-0">
+            <input id="iceRoadToggle" type="checkbox" class="sr-only peer" />
+            <div class="w-11 h-6 bg-slate-800 border border-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:bg-slate-300 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600 peer-checked:border-emerald-400"></div>
+          </label>
+        </div>
+      </section>
+
+      <!-- 2. Component Inspector Drawer Card -->
+      <section class="panel-card rounded-2xl p-4 flex flex-col gap-3 flex-1">
+        <div class="flex items-center justify-between gap-2">
+          <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            Component Inspector
+          </h2>
+          <div class="flex items-center gap-1">
+            <button id="prevStageBtn" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-mono text-slate-300 border border-slate-700 transition">
+              &larr; Prev
+            </button>
+            <span id="stageCounterText" class="font-mono text-[11px] text-slate-400 px-1.5">3 / 7</span>
+            <button id="nextStageBtn" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-mono text-slate-300 border border-slate-700 transition">
+              Next &rarr;
+            </button>
+          </div>
+        </div>
+
+        <!-- Component Pills -->
+        <div class="flex flex-wrap gap-1.5">
+          <button data-select-comp="pedal" class="comp-pill px-2 py-1 rounded-md text-[11px] font-medium bg-slate-800/80 text-slate-300 border border-slate-700 hover:border-slate-500 transition">1. Pedal</button>
+          <button data-select-comp="vacuum" class="comp-pill px-2 py-1 rounded-md text-[11px] font-medium bg-slate-800/80 text-slate-300 border border-slate-700 hover:border-slate-500 transition">2. Vacuum Valve</button>
+          <button data-select-comp="booster" class="comp-pill px-2 py-1 rounded-md text-[11px] font-medium bg-cyan-500/20 text-cyan-200 border border-cyan-400/50 transition">3. Booster</button>
+          <button data-select-comp="master" class="comp-pill px-2 py-1 rounded-md text-[11px] font-medium bg-slate-800/80 text-slate-300 border border-slate-700 hover:border-slate-500 transition">4. Master Cyl.</button>
+          <button data-select-comp="abs" class="comp-pill px-2 py-1 rounded-md text-[11px] font-medium bg-slate-800/80 text-slate-300 border border-slate-700 hover:border-slate-500 transition">5. ABS HCU</button>
+          <button data-select-comp="frontBrake" class="comp-pill px-2 py-1 rounded-md text-[11px] font-medium bg-slate-800/80 text-slate-300 border border-slate-700 hover:border-slate-500 transition">6. Front Caliper</button>
+          <button data-select-comp="rearBrake" class="comp-pill px-2 py-1 rounded-md text-[11px] font-medium bg-slate-800/80 text-slate-300 border border-slate-700 hover:border-slate-500 transition">7. Rear Caliper</button>
+        </div>
+
+        <!-- Engineering Specification Card -->
+        <div class="bg-slate-900/95 border border-slate-800 rounded-xl p-3.5 flex flex-col gap-2">
+          <div class="flex items-center justify-between gap-2">
+            <h3 id="inspectorTitle" class="text-sm font-bold text-cyan-300">Vacuum Brake Booster (Diaphragm &amp; Control Valve)</h3>
+            <span id="inspectorStageTag" class="font-mono text-[10px] px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 shrink-0">STAGE 3 OF 7</span>
+          </div>
+          <p id="inspectorDesc" class="text-xs leading-relaxed text-slate-300">
+            Divided by a rolling rubber diaphragm into a Front Vacuum Chamber (4.8 PSI) and Rear Control Chamber. Pressing the pedal closes the Vacuum Port Valve and opens the Atmospheric Air Valve—allowing 14.7 PSI air to rush behind the diaphragm, compressing the return spring and multiplying driver pedal force by 3.5x.
+          </p>
+          <div class="pt-2 border-t border-slate-800/90 flex items-center justify-between text-[11px]">
+            <span class="text-slate-400">Live Component Telemetry:</span>
+            <span id="inspectorLiveTelemetry" class="font-mono font-semibold text-amber-300">ΔP: 0.0 PSI | Assist: +0 N</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      'use strict';
+
+      // Safe DOM element lookup helper
+      function getEl(id) {
+        const node = document.getElementById(id);
+        if (!node) {
+          console.warn(`Missing expected element ID: #${id}`);
+        }
+        return node;
+      }
+
+      // =========================================================================
+      // COMPONENT ENGINEERING DATA FOR INSPECTOR
+      // =========================================================================
+      const COMPONENT_SPECS = {
+        pedal: {
+          step: 1,
+          title: 'Brake Pedal Lever & Input Pushrod',
+          tag: 'STAGE 1 OF 7',
+          colorClass: 'text-slate-100',
+          desc: 'A mechanical lever (~4:1 pedal ratio) mounted to the firewall fulcrum. Depressing the pedal rotates the lever clockwise and drives the clevis-pinned Input Pushrod linearly into the rear control valve of the vacuum booster.',
+          metric: (s) => `Travel: ${(s.pedalPos * 45).toFixed(1)} mm | Force: ${s.pedalForceN} N`,
+        },
+        vacuum: {
+          step: 2,
+          title: 'Engine Intake Manifold & One-Way Check Valve',
+          tag: 'STAGE 2 OF 7',
+          colorClass: 'text-cyan-300',
+          desc: 'Engine intake vacuum (~20 inHg / 4.8 PSI absolute) continuously evacuates air from the booster front chamber through a spring-loaded One-Way Check Valve, sealing vacuum inside the drum even under full throttle.',
+          metric: (s) => `Manifold: 4.8 PSI | Check Valve: ${s.isReleasing ? 'OPEN (EVACUATING)' : 'SEATED (HOLDING)'}`,
+        },
+        booster: {
+          step: 3,
+          title: 'Vacuum Brake Booster (Diaphragm & Control Valve)',
+          tag: 'STAGE 3 OF 7',
+          colorClass: 'text-cyan-300',
+          desc: 'Divided by a rolling rubber diaphragm into a Front Vacuum Chamber (4.8 PSI) and Rear Control Chamber. Pressing the pedal closes the Vacuum Port Valve and opens the Atmospheric Air Valve—allowing 14.7 PSI air to rush behind the diaphragm, compressing the return spring and multiplying driver pedal force by 3.5x.',
+          metric: (s) => `Rear Press: ${s.rearChamberPsi.toFixed(1)} PSI | Assist: +${s.boosterAssistN} N`,
+        },
+        master: {
+          step: 4,
+          title: 'Tandem Master Cylinder & Fluid Reservoir',
+          tag: 'STAGE 4 OF 7',
+          colorClass: 'text-rose-300',
+          desc: 'Converts boosted pushrod force into hydraulic line pressure using incompressible DOT 4 brake fluid. Primary (PRI) and Secondary (SEC) pistons slide forward, closing the compensating ports and pressurizing two independent safety circuits.',
+          metric: (s) => `Stroke: ${(s.pedalPos * 26).toFixed(1)} mm | Output: ${s.masterPsi} PSI`,
+        },
+        abs: {
+          step: 5,
+          title: 'ABS Hydraulic Control Unit (HCU) & ECU',
+          tag: 'STAGE 5 OF 7',
+          colorClass: 'text-emerald-300',
+          desc: 'Monitors toothed tone rings via Wheel Speed Sensors. On Ice/Wet surfaces under heavy braking (>55%), the ECU cycles Normally-Open Inlet Valves and Normally-Closed Outlet Valves at ~12 Hz while spinning the Return Pump and bouncing the Low-Pressure Accumulator.',
+          metric: (s) => (s.absActive ? `PULSING 12 Hz (${s.absPhase})` : 'PASS-THROUGH (NORMAL)'),
+        },
+        frontBrake: {
+          step: 6,
+          title: 'Front Floating Disc Brake (Primary Circuit)',
+          tag: 'STAGE 6 OF 7',
+          colorClass: 'text-rose-300',
+          desc: 'Delivers ~70% of stopping torque. Hydraulic fluid extends the caliper piston inward while sliding the floating caliper bridge opposite, clamping both Inner and Outer Brake Pads onto the vented rotor and converting kinetic energy into heat.',
+          metric: (s) => `Clamp: ${s.caliperPsi} PSI | Rotor: ${Math.round(s.rotorTempF)}°F`,
+        },
+        rearBrake: {
+          step: 7,
+          title: 'Rear Floating Disc Brake (Secondary Circuit)',
+          tag: 'STAGE 7 OF 7',
+          colorClass: 'text-rose-300',
+          desc: 'Operates on the independent Secondary hydraulic circuit (~30% brake bias) for straight-line stability. Includes an integrated ABS reluctor tone ring and Hall-effect sensor feeding real-time wheel RPM pulses to the ABS ECU.',
+          metric: (s) => `Clamp: ${Math.round(s.caliperPsi * 0.85)} PSI | Speed: ${s.wheelSpeedMph.toFixed(1)} MPH`,
+        },
+      };
+
+      const COMP_ORDER = Object.keys(COMPONENT_SPECS);
+
+      // =========================================================================
+      // SIMULATION STATE
+      // =========================================================================
+      const state = {
+        pedalTarget: 0,
+        pedalPos: 0,
+        prevPedalPos: 0,
+        isLatched: false,
+        isPointerDown: false,
+        pointerDownTime: 0,
+        isSpaceDown: false,
+        autoDemo: false,
+        demoClock: 0,
+        autoCruise: true,
+        iceRoad: false,
+        isReleasing: false,
+
+        vehicleSpeedMph: 65,
+        wheelSpeedMph: 65,
+        absActive: false,
+        absClock: 0,
+        absPhase: 'STANDBY',
+
+        rotorAngle: 0,
+        pumpAngle: 0,
+        rotorTempF: 95,
+        vacDashOffset: 0,
+        fluidDashOffset: 0,
+        wssDashOffset: 0,
+        selectedComp: 'booster',
+
+        // Calculated Telemetry
+        pedalForceN: 0,
+        boosterAssistN: 0,
+        rearChamberPsi: 4.8,
+        masterPsi: 0,
+        caliperPsi: 0,
+      };
+
+      // =========================================================================
+      // VERIFIED DOM REFERENCES
+      // =========================================================================
+      const dom = {
+        // Header & Sidebar Controls
+        headerBrakeBtn: getEl('headerBrakeBtn'),
+        headerBrakeDot: getEl('headerBrakeDot'),
+        headerBrakeLabel: getEl('headerBrakeLabel'),
+        mainBrakeBtn: getEl('mainBrakeBtn'),
+        mainBrakeBtnText: getEl('mainBrakeBtnText'),
+        pedalLatchBadge: getEl('pedalLatchBadge'),
+        pedalSlider: getEl('pedalSlider'),
+        pedalSliderVal: getEl('pedalSliderVal'),
+        speedSlider: getEl('speedSlider'),
+        speedSliderVal: getEl('speedSliderVal'),
+        spinWheelsBtn: getEl('spinWheelsBtn'),
+        autoCruiseToggle: getEl('autoCruiseToggle'),
+        iceRoadToggle: getEl('iceRoadToggle'),
+        autoDemoBtn: getEl('autoDemoBtn'),
+        autoDemoLabel: getEl('autoDemoLabel'),
+        roadModeBtn: getEl('roadModeBtn'),
+        roadModeDot: getEl('roadModeDot'),
+        roadModeLabel: getEl('roadModeLabel'),
+        systemBannerBadge: getEl('systemBannerBadge'),
+
+        // Telemetry Bar
+        telPedalForce: getEl('telPedalForce'),
+        telBoosterAssist: getEl('telBoosterAssist'),
+        telRearPressure: getEl('telRearPressure'),
+        telLinePsi: getEl('telLinePsi'),
+        telWheelSpeed: getEl('telWheelSpeed'),
+        telAbsState: getEl('telAbsState'),
+
+        // Inspector
+        prevStageBtn: getEl('prevStageBtn'),
+        nextStageBtn: getEl('nextStageBtn'),
+        stageCounterText: getEl('stageCounterText'),
+        inspectorTitle: getEl('inspectorTitle'),
+        inspectorStageTag: getEl('inspectorStageTag'),
+        inspectorDesc: getEl('inspectorDesc'),
+        inspectorLiveTelemetry: getEl('inspectorLiveTelemetry'),
+
+        // SVG Elements — Pedal & Vacuum
+        pedalArmGroup: getEl('pedalArmGroup'),
+        inputPushrodGroup: getEl('inputPushrodGroup'),
+        pedalForceArrowGroup: getEl('pedalForceArrowGroup'),
+        vacuumFlowDashes: getEl('vacuumFlowDashes'),
+        checkValveFlapperGroup: getEl('checkValveFlapperGroup'),
+        checkValveSpring: getEl('checkValveSpring'),
+
+        // SVG Elements — Vacuum Booster
+        rearChamberRect: getEl('rearChamberRect'),
+        rearChamberAirOverlay: getEl('rearChamberAirOverlay'),
+        frontChamberRect: getEl('frontChamberRect'),
+        airInflowStreaks: getEl('airInflowStreaks'),
+        boosterTopSpring: getEl('boosterTopSpring'),
+        boosterBotSpring: getEl('boosterBotSpring'),
+        boosterDiaphragmGroup: getEl('boosterDiaphragmGroup'),
+        vacuumPortValve: getEl('vacuumPortValve'),
+        atmosAirValve: getEl('atmosAirValve'),
+        reactionDisc: getEl('reactionDisc'),
+        rearChamberSvgText: getEl('rearChamberSvgText'),
+
+        // SVG Elements — Master Cylinder & Fluid Lines
+        reservoirFluidRect: getEl('reservoirFluidRect'),
+        fluidSensorFloat: getEl('fluidSensorFloat'),
+        mcPriChamber: getEl('mcPriChamber'),
+        mcSecChamber: getEl('mcSecChamber'),
+        mcPriSpring: getEl('mcPriSpring'),
+        mcSecSpring: getEl('mcSecSpring'),
+        mcPriPistonGroup: getEl('mcPriPistonGroup'),
+        mcSecPistonGroup: getEl('mcSecPistonGroup'),
+        priInFlow: getEl('priInFlow'),
+        priOutFlow: getEl('priOutFlow'),
+        secInFlow: getEl('secInFlow'),
+        secOutFlow: getEl('secOutFlow'),
+        absReturnPipeGroup: getEl('absReturnPipeGroup'),
+        absReturnDashes: getEl('absReturnDashes'),
+
+        // SVG Elements — ABS HCU & WSS
+        absInlet1Plunger: getEl('absInlet1Plunger'),
+        absOutlet1Plunger: getEl('absOutlet1Plunger'),
+        absInlet2Plunger: getEl('absInlet2Plunger'),
+        absOutlet2Plunger: getEl('absOutlet2Plunger'),
+        absPumpCamGroup: getEl('absPumpCamGroup'),
+        absAccumPiston: getEl('absAccumPiston'),
+        absEcuSvgText: getEl('absEcuSvgText'),
+        frontWssDashes: getEl('frontWssDashes'),
+        rearWssDashes: getEl('rearWssDashes'),
+
+        // SVG Elements — Front & Rear Disc Brakes
+        frontRotorGroup: getEl('frontRotorGroup'),
+        frontRotorHeat: getEl('frontRotorHeat'),
+        frontOuterCaliperGroup: getEl('frontOuterCaliperGroup'),
+        frontCaliperFluid: getEl('frontCaliperFluid'),
+        frontInnerPistonGroup: getEl('frontInnerPistonGroup'),
+        frontFrictionOuterGlow: getEl('frontFrictionOuterGlow'),
+        frontFrictionInnerGlow: getEl('frontFrictionInnerGlow'),
+
+        rearRotorGroup: getEl('rearRotorGroup'),
+        rearRotorHeat: getEl('rearRotorHeat'),
+        rearOuterCaliperGroup: getEl('rearOuterCaliperGroup'),
+        rearCaliperFluid: getEl('rearCaliperFluid'),
+        rearInnerPistonGroup: getEl('rearInnerPistonGroup'),
+        rearFrictionOuterGlow: getEl('rearFrictionOuterGlow'),
+        rearFrictionInnerGlow: getEl('rearFrictionInnerGlow'),
+      };
+
+      // =========================================================================
+      // HELPER: GENERATE DYNAMIC ZIGZAG SPRING PATH
+      // =========================================================================
+      function createSpringPath(x1, x2, yCenter, amp, coils) {
+        const width = Math.max(12, x2 - x1);
+        const step = width / (coils * 2);
+        let d = `M ${x1.toFixed(1)} ${yCenter}`;
+        for (let i = 1; i < coils * 2; i++) {
+          const x = x1 + i * step;
+          const y = yCenter + (i % 2 === 1 ? -amp : amp);
+          d += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;
+        }
+        d += ` L ${x2.toFixed(1)} ${yCenter}`;
+        return d;
+      }
+
+      // =========================================================================
+      // COMPONENT SELECTION & INSPECTOR UPDATES
+      // =========================================================================
+      function selectComponent(key) {
+        if (!COMPONENT_SPECS[key]) return;
+        state.selectedComp = key;
+
+        document.querySelectorAll('.component-hotspot').forEach((el) => {
+          el.classList.toggle('active', el.dataset.comp === key);
+        });
+
+        document.querySelectorAll('.comp-pill').forEach((btn) => {
+          const active = btn.dataset.selectComp === key;
+          btn.className = active
+            ? 'comp-pill px-2 py-1 rounded-md text-[11px] font-medium bg-cyan-500/20 text-cyan-200 border border-cyan-400/50 transition'
+            : 'comp-pill px-2 py-1 rounded-md text-[11px] font-medium bg-slate-800/80 text-slate-300 border border-slate-700 hover:border-slate-500 transition';
+        });
+
+        const spec = COMPONENT_SPECS[key];
+        dom.inspectorTitle.textContent = spec.title;
+        dom.inspectorTitle.className = `text-sm font-bold ${spec.colorClass}`;
+        dom.inspectorStageTag.textContent = spec.tag;
+        dom.inspectorDesc.textContent = spec.desc;
+        dom.stageCounterText.textContent = `${spec.step} / ${COMP_ORDER.length}`;
+        dom.inspectorLiveTelemetry.textContent = spec.metric(state);
+      }
+
+      document.querySelectorAll('.component-hotspot').forEach((el) => {
+        el.addEventListener('click', () => {
+          selectComponent(el.dataset.comp);
+          // Clicking the brake pedal directly on the diagram also toggles brake latch!
+          if (el.dataset.comp === 'pedal') {
+            toggleBrakeLatch();
+          }
+        });
+      });
+
+      document.querySelectorAll('.comp-pill').forEach((btn) => {
+        btn.addEventListener('click', () => selectComponent(btn.dataset.selectComp));
+      });
+
+      dom.prevStageBtn.addEventListener('click', () => {
+        const i = COMP_ORDER.indexOf(state.selectedComp);
+        selectComponent(COMP_ORDER[(i - 1 + COMP_ORDER.length) % COMP_ORDER.length]);
+      });
+
+      dom.nextStageBtn.addEventListener('click', () => {
+        const i = COMP_ORDER.indexOf(state.selectedComp);
+        selectComponent(COMP_ORDER[(i + 1) % COMP_ORDER.length]);
+      });
+
+      // =========================================================================
+      // BRAKE APPLICATION & ROAD MODE CONTROLS
+      // =========================================================================
+      function syncControlUI() {
+        const pct = Math.round(state.pedalTarget * 100);
+        dom.pedalSlider.value = pct;
+        dom.pedalSliderVal.textContent = `${pct}%`;
+
+        if (state.isLatched) {
+          dom.pedalLatchBadge.textContent = `${pct}% LATCHED ON`;
+          dom.pedalLatchBadge.className = 'font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-rose-500/25 text-rose-200 border border-rose-400/50';
+          dom.mainBrakeBtnText.textContent = 'RELEASE LATCHED BRAKE (85%)';
+          dom.headerBrakeLabel.textContent = 'RELEASE BRAKE (LATCHED)';
+          dom.headerBrakeDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-300 animate-ping';
+        } else if (pct > 0) {
+          dom.pedalLatchBadge.textContent = `${pct}% APPLIED`;
+          dom.pedalLatchBadge.className = 'font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40';
+          dom.mainBrakeBtnText.textContent = 'PRESS / LATCH BRAKE PEDAL';
+          dom.headerBrakeLabel.textContent = 'PRESS / LATCH BRAKE';
+          dom.headerBrakeDot.className = 'w-2.5 h-2.5 rounded-full bg-white';
+        } else {
+          dom.pedalLatchBadge.textContent = '0% RELEASED';
+          dom.pedalLatchBadge.className = 'font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700';
+          dom.mainBrakeBtnText.textContent = 'PRESS / LATCH BRAKE PEDAL';
+          dom.headerBrakeLabel.textContent = 'PRESS / LATCH BRAKE';
+          dom.headerBrakeDot.className = 'w-2.5 h-2.5 rounded-full bg-white/80';
+        }
+
+        // Road mode button & checkbox sync
+        dom.iceRoadToggle.checked = state.iceRoad;
+        if (state.iceRoad) {
+          dom.roadModeLabel.textContent = 'Road: Ice / Wet (ABS Ready)';
+          dom.roadModeDot.className = 'w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]';
+          dom.roadModeBtn.className = 'px-3 py-2 rounded-xl text-xs font-semibold bg-emerald-950/90 hover:bg-emerald-900 text-emerald-200 border border-emerald-400/50 transition flex items-center gap-1.5';
+        } else {
+          dom.roadModeLabel.textContent = 'Road: Dry Asphalt';
+          dom.roadModeDot.className = 'w-2 h-2 rounded-full bg-slate-400';
+          dom.roadModeBtn.className = 'px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800/95 hover:bg-slate-700 text-slate-200 border border-slate-600 transition flex items-center gap-1.5';
+        }
+
+        // Auto-Demo button sync
+        if (state.autoDemo) {
+          dom.autoDemoLabel.textContent = 'Auto-Demo Loop: ON';
+          dom.autoDemoBtn.className = 'px-3 py-2 rounded-xl text-xs font-semibold bg-cyan-950/90 hover:bg-cyan-900 text-cyan-200 border border-cyan-400/60 transition flex items-center gap-1.5 shadow-[0_0_12px_rgba(34,211,238,0.25)]';
+        } else {
+          dom.autoDemoLabel.textContent = 'Auto-Demo Loop: OFF';
+          dom.autoDemoBtn.className = 'px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800/95 hover:bg-slate-700 text-cyan-300 border border-cyan-500/40 transition flex items-center gap-1.5';
+        }
+      }
+
+      function toggleBrakeLatch() {
+        state.autoDemo = false;
+        if (state.isLatched || state.pedalTarget > 0.1) {
+          state.isLatched = false;
+          state.pedalTarget = 0;
+        } else {
+          state.isLatched = true;
+          state.pedalTarget = 0.85;
+          if (state.vehicleSpeedMph < 10) {
+            state.vehicleSpeedMph = 65;
+            state.wheelSpeedMph = 65;
+          }
+        }
+        syncControlUI();
+      }
+
+      // Smart Click-to-Latch (<250ms) vs Press-and-Hold (>250ms) handler
+      function attachSmartBrakeButton(btn) {
+        if (!btn) return;
+        btn.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          state.autoDemo = false;
+          state.isPointerDown = true;
+          state.pointerDownTime = performance.now();
+
+          if (state.isLatched) {
+            // Clicking while latched prepares to unlatch on release
+            return;
+          }
+          state.pedalTarget = 0.9;
+          if (state.vehicleSpeedMph < 10) {
+            state.vehicleSpeedMph = 65;
+            state.wheelSpeedMph = 65;
+          }
+          syncControlUI();
+        });
+      }
+
+      window.addEventListener('pointerup', () => {
+        if (!state.isPointerDown) return;
+        state.isPointerDown = false;
+        const holdDuration = performance.now() - state.pointerDownTime;
+
+        if (state.isLatched) {
+          // User clicked to unlatch
+          state.isLatched = false;
+          state.pedalTarget = 0;
+        } else if (holdDuration < 250) {
+          // Short click -> Latch ON at 85% so user can watch hands-free!
+          state.isLatched = true;
+          state.pedalTarget = 0.85;
+        } else {
+          // Long hold -> Release smoothly to 0%
+          state.isLatched = false;
+          state.pedalTarget = 0;
+        }
+        syncControlUI();
+      });
+
+      attachSmartBrakeButton(dom.mainBrakeBtn);
+      attachSmartBrakeButton(dom.headerBrakeBtn);
+
+      // Pedal Slider manual scrubbing
+      dom.pedalSlider.addEventListener('input', (e) => {
+        state.autoDemo = false;
+        state.isLatched = false;
+        state.pedalTarget = Number(e.target.value) / 100;
+        syncControlUI();
+      });
+
+      // Vehicle Speed Slider & Cruise Button
+      dom.speedSlider.addEventListener('input', (e) => {
+        state.vehicleSpeedMph = Number(e.target.value);
+        state.wheelSpeedMph = state.vehicleSpeedMph;
+        dom.speedSliderVal.textContent = `${Math.round(state.vehicleSpeedMph)} MPH`;
+      });
+
+      dom.spinWheelsBtn.addEventListener('click', () => {
+        state.vehicleSpeedMph = 65;
+        state.wheelSpeedMph = 65;
+        dom.speedSlider.value = 65;
+        dom.speedSliderVal.textContent = '65 MPH';
+      });
+
+      dom.autoCruiseToggle.addEventListener('change', (e) => {
+        state.autoCruise = e.target.checked;
+      });
+
+      // Road Surface / ABS Toggle
+      function setIceRoad(enabled) {
+        state.iceRoad = enabled;
+        syncControlUI();
+      }
+      dom.iceRoadToggle.addEventListener('change', (e) => setIceRoad(e.target.checked));
+      dom.roadModeBtn.addEventListener('click', () => setIceRoad(!state.iceRoad));
+
+      // Auto-Demo Loop Toggle
+      dom.autoDemoBtn.addEventListener('click', () => {
+        state.autoDemo = !state.autoDemo;
+        state.isLatched = false;
+        state.demoClock = 0;
+        if (state.autoDemo && state.vehicleSpeedMph < 20) {
+          state.vehicleSpeedMph = 65;
+          state.wheelSpeedMph = 65;
+        }
+        syncControlUI();
+      });
+
+      // Spacebar Hold Support
+      window.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' && document.activeElement.tagName !== 'INPUT') {
+          e.preventDefault();
+          if (!state.isSpaceDown) {
+            state.isSpaceDown = true;
+            state.autoDemo = false;
+            state.isLatched = false;
+            state.pedalTarget = 1.0;
+            if (state.vehicleSpeedMph < 10) {
+              state.vehicleSpeedMph = 65;
+              state.wheelSpeedMph = 65;
+            }
+            syncControlUI();
+          }
+        }
+      });
+
+      window.addEventListener('keyup', (e) => {
+        if (e.code === 'Space' && state.isSpaceDown) {
+          state.isSpaceDown = false;
+          state.pedalTarget = 0;
+          syncControlUI();
+        }
+      });
+
+      // =========================================================================
+      // MAIN REAL-TIME PHYSICS & SVG RENDERING LOOP (60 FPS)
+      // =========================================================================
+      let lastFrameTime = null;
+
+      function tick(now) {
+        try {
+          if (lastFrameTime === null) lastFrameTime = now;
+          const dt = Math.min(0.05, (now - lastFrameTime) / 1000);
+          lastFrameTime = now;
+
+          // 1. Auto-Demo Sequence (11-second continuous showcase cycle)
+          if (state.autoDemo) {
+            state.demoClock = (state.demoClock + dt) % 11.0;
+            if (state.demoClock < 2.0) {
+              // Phase 1: Vacuum balanced cruise
+              state.pedalTarget = 0;
+              state.iceRoad = false;
+            } else if (state.demoClock < 5.0) {
+              // Phase 2: Progressive normal braking (0 -> 55%)
+              const t = (state.demoClock - 2.0) / 3.0;
+              state.pedalTarget = 0.55 * Math.min(1, t * 1.4);
+              state.iceRoad = false;
+            } else if (state.demoClock < 8.5) {
+              // Phase 3: Heavy braking on Ice/Wet -> ABS 12Hz Modulation!
+              state.iceRoad = true;
+              state.pedalTarget = 0.92;
+              if (state.vehicleSpeedMph < 22) {
+                state.vehicleSpeedMph = 55;
+              }
+            } else {
+              // Phase 4: Release pedal & vacuum evacuation
+              state.iceRoad = false;
+              state.pedalTarget = 0;
+            }
+            syncControlUI();
+          }
+
+          // 2. Smooth Pedal Kinematics
+          state.prevPedalPos = state.pedalPos;
+          const slew = state.pedalTarget > state.pedalPos ? 8.0 : 5.5;
+          state.pedalPos += (state.pedalTarget - state.pedalPos) * Math.min(1, slew * dt);
+          if (Math.abs(state.pedalTarget - state.pedalPos) < 0.002) {
+            state.pedalPos = state.pedalTarget;
+          }
+          state.isReleasing = state.pedalPos < state.prevPedalPos - 0.001;
+
+          // 3. Pneumatic Vacuum Booster Physics
+          // Full atmospheric admission reached around 85% pedal travel
+          const boostNorm = Math.min(1, state.pedalPos / 0.85);
+          state.rearChamberPsi = 4.8 + boostNorm * (14.7 - 4.8); // 4.8 PSI (vacuum) -> 14.7 PSI (atm)
+          state.pedalForceN = Math.round(state.pedalPos * 420);
+          state.boosterAssistN = Math.round(boostNorm * 1470); // 3.5x assist force
+          const totalPushrodForceN = state.pedalForceN + state.boosterAssistN;
+
+          // 4. Master Cylinder & ABS Modulation Physics
+          state.masterPsi = Math.round((totalPushrodForceN / 1890) * 1450);
+
+          // ABS triggers on Ice/Wet road when heavy braking (>55%) is applied while moving
+          state.absActive = state.iceRoad && state.pedalPos > 0.55 && state.vehicleSpeedMph > 2.0;
+
+          let absCycle = 0;
+          if (state.absActive) {
+            state.absClock += dt * 12.0; // ~12 Hz rapid ABS solenoid pulsing
+            absCycle = state.absClock % 1;
+            if (absCycle < 0.35) {
+              state.absPhase = 'APPLY';
+              state.caliperPsi = Math.round(480 + (absCycle / 0.35) * 320);
+            } else if (absCycle < 0.65) {
+              state.absPhase = 'HOLD';
+              state.caliperPsi = 800;
+            } else {
+              state.absPhase = 'DUMP';
+              state.caliperPsi = Math.round(800 - ((absCycle - 0.65) / 0.35) * 380);
+            }
+          } else {
+            state.absPhase = state.pedalPos > 0.04 ? 'PASS-THRU' : 'STANDBY';
+            state.caliperPsi = state.masterPsi;
+          }
+
+          // 5. Vehicle Speed, Deceleration & Auto-Cruise Recovery
+          if (state.caliperPsi > 20 && state.vehicleSpeedMph > 0) {
+            const decelRate = (state.iceRoad ? 10.5 : 26.0) * Math.min(1, state.caliperPsi / 1000);
+            state.vehicleSpeedMph = Math.max(0, state.vehicleSpeedMph - decelRate * dt);
+          } else if (state.autoCruise && state.pedalPos < 0.03 && state.vehicleSpeedMph < 65) {
+            // Smoothly re-accelerate to 65 MPH when brake is released
+            state.vehicleSpeedMph = Math.min(65, state.vehicleSpeedMph + 24.0 * dt);
+          }
+
+          dom.speedSlider.value = Math.round(state.vehicleSpeedMph);
+          dom.speedSliderVal.textContent = `${Math.round(state.vehicleSpeedMph)} MPH`;
+
+          // Wheel speed tracks vehicle speed with realistic micro-slip oscillation during ABS
+          if (state.absActive) {
+            const slipOsc = 0.82 + 0.14 * Math.sin(state.absClock * Math.PI * 2);
+            state.wheelSpeedMph = state.vehicleSpeedMph * slipOsc;
+          } else {
+            state.wheelSpeedMph = state.vehicleSpeedMph;
+          }
+
+          // Spin rotors & ABS return pump
+          state.rotorAngle = (state.rotorAngle + state.wheelSpeedMph * dt * 16.0) % 360;
+          if (state.absActive) {
+            state.pumpAngle = (state.pumpAngle + dt * 1150) % 360;
+          }
+
+          // Rotor thermal heating & cooling
+          const frictionPower = (state.caliperPsi / 1450) * (state.wheelSpeedMph / 65);
+          state.rotorTempF += frictionPower * 135 * dt;
+          state.rotorTempF -= (state.rotorTempF - 95) * 0.25 * dt;
+          state.rotorTempF = Math.max(95, Math.min(920, state.rotorTempF));
+
+          // 6. Render All SVG Component Animations
+          updateSvgVisuals(dt, boostNorm);
+
+          // 7. Update Live Telemetry Bar & Inspector
+          updateTelemetryReadouts();
+        } catch (err) {
+          console.error('Simulation frame error:', err);
+        }
+
+        requestAnimationFrame(tick);
+      }
+
+      function updateSvgVisuals(dt, boostNorm) {
+        const p = state.pedalPos;
+
+        // --- A. Brake Pedal & Input Pushrod ---
+        const pedalDeg = -p * 18;
+        dom.pedalArmGroup.setAttribute('transform', `rotate(${pedalDeg.toFixed(2)}, 115, 278)`);
+        const pushrodDx = p * 38;
+        dom.inputPushrodGroup.setAttribute('transform', `translate(${pushrodDx.toFixed(2)}, 0)`);
+        dom.pedalForceArrowGroup.setAttribute('opacity', p > 0.03 ? Math.min(1, p * 1.5).toFixed(2) : '0');
+
+        // --- B. Vacuum Hose & One-Way Check Valve ---
+        const vacSpeed = state.isReleasing ? 110 : 34;
+        state.vacDashOffset = (state.vacDashOffset + dt * vacSpeed) % 240;
+        dom.vacuumFlowDashes.setAttribute('stroke-dashoffset', (-state.vacDashOffset).toFixed(1));
+
+        // Check valve flapper opens left when evacuating rear chamber on release
+        const valveOpenDx = state.isReleasing ? -6 : (p < 0.03 ? -2 : 0);
+        dom.checkValveFlapperGroup.setAttribute('transform', `translate(${valveOpenDx.toFixed(1)}, 0)`);
+        dom.checkValveSpring.setAttribute('d', createSpringPath(308 + valveOpenDx, 350, 94, 8, 3));
+
+        // --- C. Vacuum Brake Booster Cutaway ---
+        const diaphragmDx = p * 40;
+        const diaphragmX = 398 + diaphragmDx;
+        dom.boosterDiaphragmGroup.setAttribute('transform', `translate(${diaphragmDx.toFixed(2)}, 0)`);
+
+        // Resize Rear Control Chamber & Front Vacuum Chamber
+        dom.rearChamberRect.setAttribute('width', (126 + diaphragmDx).toFixed(1));
+        dom.rearChamberAirOverlay.setAttribute('width', (126 + diaphragmDx).toFixed(1));
+        dom.rearChamberAirOverlay.setAttribute('opacity', (boostNorm * 0.94).toFixed(2));
+
+        dom.frontChamberRect.setAttribute('x', diaphragmX.toFixed(1));
+        dom.frontChamberRect.setAttribute('width', (154 - diaphragmDx).toFixed(1));
+
+        // Compress Booster Return Springs
+        dom.boosterTopSpring.setAttribute('d', createSpringPath(diaphragmX + 18, 548, 306, 20, 4));
+        dom.boosterBotSpring.setAttribute('d', createSpringPath(diaphragmX + 18, 548, 540, 20, 4));
+
+        // Control Valve Plungers & Atmospheric Air Inflow Streaks
+        dom.vacuumPortValve.setAttribute('height', (4 + Math.min(1, p * 4) * 14).toFixed(1));
+        const airValveOpenDx = Math.min(1, p * 3.2) * 11;
+        dom.atmosAirValve.setAttribute('transform', `translate(${airValveOpenDx.toFixed(1)}, 0)`);
+        dom.reactionDisc.setAttribute('transform', `scale(${(1 + p * 0.28).toFixed(2)}, 1)`);
+
+        const airStreamOpacity = p > 0.04 && !state.isReleasing ? Math.min(1, p * 1.6) : 0;
+        dom.airInflowStreaks.setAttribute('opacity', airStreamOpacity.toFixed(2));
+        dom.airInflowStreaks.setAttribute('stroke-dashoffset', (-state.vacDashOffset * 1.3).toFixed(1));
+
+        // Rear chamber pressure label
+        dom.rearChamberSvgText.textContent =
+          state.rearChamberPsi > 8.5
+            ? `${state.rearChamberPsi.toFixed(1)} PSI (AIR)`
+            : `${state.rearChamberPsi.toFixed(1)} PSI (VAC)`;
+        dom.rearChamberSvgText.setAttribute('fill', state.rearChamberPsi > 8.5 ? '#fbbf24' : '#22d3ee');
+
+        // --- D. Tandem Master Cylinder & Reservoir ---
+        const mcPriDx = p * 38;
+        const mcSecDx = p * 30;
+        dom.mcPriPistonGroup.setAttribute('transform', `translate(${mcPriDx.toFixed(2)}, 0)`);
+        dom.mcSecPistonGroup.setAttribute('transform', `translate(${mcSecDx.toFixed(2)}, 0)`);
+
+        const priLeft = 640 + mcPriDx;
+        const priRight = 720 + mcSecDx;
+        dom.mcPriChamber.setAttribute('x', priLeft.toFixed(1));
+        dom.mcPriChamber.setAttribute('width', Math.max(12, priRight - priLeft).toFixed(1));
+        dom.mcPriSpring.setAttribute('d', createSpringPath(priLeft + 4, priRight - 4, 379, 24, 3));
+
+        const secLeft = 768 + mcSecDx;
+        dom.mcSecChamber.setAttribute('x', secLeft.toFixed(1));
+        dom.mcSecChamber.setAttribute('width', Math.max(12, 864 - secLeft).toFixed(1));
+        dom.mcSecSpring.setAttribute('d', createSpringPath(secLeft + 4, 858, 379, 24, 3));
+
+        // Reservoir fluid meniscus & level float
+        const fluidDropPx = p * 8.5;
+        dom.reservoirFluidRect.setAttribute('y', (192 + fluidDropPx).toFixed(1));
+        dom.reservoirFluidRect.setAttribute('height', (82 - fluidDropPx).toFixed(1));
+        dom.fluidSensorFloat.setAttribute('transform', `translate(0, ${fluidDropPx.toFixed(1)})`);
+
+        // --- E. Hydraulic Brake Line Flow Dashes ---
+        const flowSign = state.isReleasing ? 1 : p > 0.02 ? -1 : 0;
+        const flowSpeed = state.absActive ? 175 : Math.abs(state.pedalTarget - p) * 280 + p * 45;
+        state.fluidDashOffset = (state.fluidDashOffset + dt * flowSpeed * flowSign) % 240;
+
+        dom.priInFlow.setAttribute('stroke-dashoffset', state.fluidDashOffset.toFixed(1));
+        dom.priOutFlow.setAttribute('stroke-dashoffset', state.fluidDashOffset.toFixed(1));
+        dom.secInFlow.setAttribute('stroke-dashoffset', state.fluidDashOffset.toFixed(1));
+        dom.secOutFlow.setAttribute('stroke-dashoffset', state.fluidDashOffset.toFixed(1));
+
+        // --- F. ABS Solenoid Valves, Accumulator & Return Pump ---
+        if (state.absActive) {
+          dom.absEcuSvgText.textContent = `ABS: ${state.absPhase}`;
+          dom.absEcuSvgText.setAttribute('fill', '#fbbf24');
+          dom.absReturnPipeGroup.setAttribute('opacity', '1');
+          dom.absReturnDashes.setAttribute('stroke-dashoffset', (-state.vacDashOffset * 1.8).toFixed(1));
+
+          const inletOpen = state.absPhase === 'APPLY';
+          const outletOpen = state.absPhase === 'DUMP';
+
+          // Inlet valve plungers oscillate vertically
+          dom.absInlet1Plunger.setAttribute('y', inletOpen ? '535' : '548');
+          dom.absInlet1Plunger.setAttribute('fill', inletOpen ? '#10b981' : '#f43f5e');
+          dom.absInlet2Plunger.setAttribute('y', inletOpen ? '641' : '654');
+          dom.absInlet2Plunger.setAttribute('fill', inletOpen ? '#10b981' : '#f43f5e');
+
+          // Outlet dump valve plungers oscillate vertically
+          dom.absOutlet1Plunger.setAttribute('y', outletOpen ? '570' : '582');
+          dom.absOutlet1Plunger.setAttribute('fill', outletOpen ? '#fbbf24' : '#475569');
+          dom.absOutlet2Plunger.setAttribute('y', outletOpen ? '685' : '697');
+          dom.absOutlet2Plunger.setAttribute('fill', outletOpen ? '#fbbf24' : '#475569');
+
+          // Low-pressure accumulator piston bounces upward during DUMP
+          dom.absAccumPiston.setAttribute('y', outletOpen ? '679' : '692');
+        } else {
+          dom.absEcuSvgText.textContent = state.wheelSpeedMph > 1 ? 'MONITORING' : 'STANDBY';
+          dom.absEcuSvgText.setAttribute('fill', '#a7f3d0');
+          dom.absReturnPipeGroup.setAttribute('opacity', '0.45');
+
+          dom.absInlet1Plunger.setAttribute('y', '535');
+          dom.absInlet1Plunger.setAttribute('fill', '#10b981');
+          dom.absInlet2Plunger.setAttribute('y', '641');
+          dom.absInlet2Plunger.setAttribute('fill', '#10b981');
+
+          dom.absOutlet1Plunger.setAttribute('y', '582');
+          dom.absOutlet1Plunger.setAttribute('fill', '#475569');
+          dom.absOutlet2Plunger.setAttribute('y', '697');
+          dom.absOutlet2Plunger.setAttribute('fill', '#475569');
+          dom.absAccumPiston.setAttribute('y', '692');
+        }
+
+        dom.absPumpCamGroup.setAttribute('transform', `rotate(${state.pumpAngle.toFixed(1)}, 634, 614)`);
+
+        // --- G. ABS Wheel Speed Sensor Electrical Signal Pulses ---
+        if (state.wheelSpeedMph > 0.5) {
+          state.wssDashOffset = (state.wssDashOffset - dt * state.wheelSpeedMph * 3.6) % 180;
+          dom.frontWssDashes.setAttribute('stroke-dashoffset', state.wssDashOffset.toFixed(1));
+          dom.rearWssDashes.setAttribute('stroke-dashoffset', state.wssDashOffset.toFixed(1));
+          dom.frontWssDashes.setAttribute('opacity', '1');
+          dom.rearWssDashes.setAttribute('opacity', '1');
+        } else {
+          dom.frontWssDashes.setAttribute('opacity', '0.25');
+          dom.rearWssDashes.setAttribute('opacity', '0.25');
+        }
+
+        // --- H. Front & Rear Floating Disc Brakes (Rotors, Pistons & Dual Pads) ---
+        dom.frontRotorGroup.setAttribute('transform', `rotate(${state.rotorAngle.toFixed(1)}, 1126, 212)`);
+        dom.rearRotorGroup.setAttribute('transform', `rotate(${state.rotorAngle.toFixed(1)}, 1126, 568)`);
+
+        // Dual-action floating caliper clamping:
+        // Inner piston + inner pad push left (-9px) onto rotor's inner face;
+        // Floating caliper bridge + outer pad pull right (+5px) onto rotor's outer face!
+        const clampNorm = Math.min(1, state.caliperPsi / 1150);
+
+        dom.frontInnerPistonGroup.setAttribute('transform', `translate(${(-clampNorm * 9.0).toFixed(2)}, 0)`);
+        dom.frontOuterCaliperGroup.setAttribute('transform', `translate(${(clampNorm * 5.0).toFixed(2)}, 0)`);
+
+        dom.rearInnerPistonGroup.setAttribute('transform', `translate(${(-clampNorm * 8.0).toFixed(2)}, 0)`);
+        dom.rearOuterCaliperGroup.setAttribute('transform', `translate(${(clampNorm * 4.5).toFixed(2)}, 0)`);
+
+        // Caliper hydraulic chamber pressure glow
+        const boreOpacity = (0.32 + clampNorm * 0.68).toFixed(2);
+        dom.frontCaliperFluid.setAttribute('opacity', boreOpacity);
+        dom.rearCaliperFluid.setAttribute('opacity', boreOpacity);
+
+        // Friction contact lines on BOTH sides of the rotor
+        const frictionGlow = state.wheelSpeedMph > 1.5 ? clampNorm : 0;
+        dom.frontFrictionOuterGlow.setAttribute('opacity', frictionGlow.toFixed(2));
+        dom.frontFrictionInnerGlow.setAttribute('opacity', frictionGlow.toFixed(2));
+        dom.rearFrictionOuterGlow.setAttribute('opacity', (frictionGlow * 0.85).toFixed(2));
+        dom.rearFrictionInnerGlow.setAttribute('opacity', (frictionGlow * 0.85).toFixed(2));
+
+        // Rotor thermal heat glow
+        const heatNorm = Math.max(0, Math.min(1, (state.rotorTempF - 140) / 520));
+        dom.frontRotorHeat.setAttribute('opacity', heatNorm.toFixed(2));
+        dom.rearRotorHeat.setAttribute('opacity', (heatNorm * 0.72).toFixed(2));
+      }
+
+      function updateTelemetryReadouts() {
+        dom.telPedalForce.textContent = `${state.pedalForceN} N`;
+        dom.telBoosterAssist.textContent = `+${state.boosterAssistN} N`;
+        dom.telRearPressure.textContent =
+          state.rearChamberPsi > 8.5
+            ? `${state.rearChamberPsi.toFixed(1)} PSI (ATM)`
+            : `${state.rearChamberPsi.toFixed(1)} PSI (VAC)`;
+        dom.telLinePsi.textContent = `${state.caliperPsi} PSI`;
+        dom.telWheelSpeed.textContent = `${state.wheelSpeedMph.toFixed(1)} MPH`;
+
+        if (state.absActive) {
+          dom.telAbsState.textContent = `ACTIVE — ${state.absPhase}`;
+          dom.telAbsState.className = 'font-mono text-xs sm:text-sm font-bold text-amber-300 abs-flashing';
+
+          dom.systemBannerBadge.textContent = 'ABS ACTIVE — MODULATING PRESSURE';
+          dom.systemBannerBadge.className = 'px-2.5 py-0.5 rounded-full font-mono text-[11px] font-bold bg-amber-500/25 text-amber-200 border border-amber-400/60 abs-flashing';
+        } else if (state.isReleasing) {
+          dom.telAbsState.textContent = 'RELEASING (OPEN)';
+          dom.telAbsState.className = 'font-mono text-xs sm:text-sm font-bold text-cyan-300';
+
+          dom.systemBannerBadge.textContent = 'STATE: PEDAL RELEASE (VACUUM EVACUATING)';
+          dom.systemBannerBadge.className = 'px-2.5 py-0.5 rounded-full font-mono text-[11px] font-semibold bg-cyan-500/15 text-cyan-300 border border-cyan-500/35';
+        } else if (state.pedalPos > 0.04) {
+          dom.telAbsState.textContent = 'PASS-THROUGH (OPEN)';
+          dom.telAbsState.className = 'font-mono text-xs sm:text-sm font-bold text-emerald-300';
+
+          dom.systemBannerBadge.textContent = 'STATE: VACUUM ASSIST + HYDRAULIC CLAMPING';
+          dom.systemBannerBadge.className = 'px-2.5 py-0.5 rounded-full font-mono text-[11px] font-semibold bg-rose-500/20 text-rose-200 border border-rose-400/50';
+        } else {
+          dom.telAbsState.textContent = 'STANDBY (OPEN)';
+          dom.telAbsState.className = 'font-mono text-xs sm:text-sm font-bold text-slate-300';
+
+          dom.systemBannerBadge.textContent = 'STATE: VACUUM CHARGED & BALANCED';
+          dom.systemBannerBadge.className = 'px-2.5 py-0.5 rounded-full font-mono text-[11px] font-semibold bg-cyan-500/15 text-cyan-300 border border-cyan-500/35';
+        }
+
+        const spec = COMPONENT_SPECS[state.selectedComp];
+        if (spec) {
+          dom.inspectorLiveTelemetry.textContent = spec.metric(state);
+        }
+      }
+
+      // Initialize UI & Start 60FPS Animation Loop
+      selectComponent('booster');
+      syncControlUI();
+      requestAnimationFrame(tick);
+    });
+  </script>
+</body>
+</html>
