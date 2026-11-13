@@ -4,6 +4,7 @@ An interactive, single-file HTML5/SVG engineering schematic and real-time 60 FPS
 
 Designed as a self-contained educational and diagnostic visualization, this application animates every pneumatic, mechanical, hydraulic, and electronic stage from driver foot input at the brake pedal to dual-pad clamping on vented disc rotors.
 
+![Description of the screenshot](brake_screenshot01.png)
 ---
 
 ## Key Features
